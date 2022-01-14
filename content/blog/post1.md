@@ -9,7 +9,7 @@ DisableComments: false
 
 ## # Summary
 While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path transversal vulnerability.
-Abode reader was also using Google play core library for dynamic code loading. using path transversal bug and dynamic code loading, i was able to acheive remote code execution.
+Abode reader was also using Google play core library for dynamic code loading. using path transversal bug and dynamic code loading,i was able to acheive remote code execution.
 
 ## # Finding Path transversal vulnerability
 
