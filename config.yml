@@ -7,7 +7,7 @@ enableRobotsTXT : true #leave true for SEO
 #this file instructs search engine crawlers on how to acess the site
 
 params:
-  title : "Hi! I'm Sunny 👋Welcome!" #emphasised line on the homepage
+  title : "Hi! I'm Sunny 👋Welcome!" #emphasised  line on the homepage
   author : "Sunny Gupta"
   copyright : "2022" #copyright text in the footer
  # description : "Call me Sunny" #introduction line on homepage
