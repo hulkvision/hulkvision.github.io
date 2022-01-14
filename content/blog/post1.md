@@ -180,7 +180,7 @@ public static String getModifiedFileNameWithExtensionUsingIntentData(String str,
 Have a nice day! and if you got any doubt you can contact me on Twitter.
 
 #### Timeline
-- Jul 29th,2021 - Reported the vulnerability
+- Jul 29th,2021 - Reported the vulnerability to adobe
 - Aug 4th ,2021 - report traiged
 - Oct 13th,2021 - Vulnerability Fixed
 - Dec 4th ,2021 - $10000 bounty awarded from GPSRP
