@@ -1,11 +1,12 @@
 ---
 title: "RCE in Adobe Acrobat Reader for android(CVE-2021-40724)"
-date: 2022-01-10T11:44:49+05:30
+date: 2022-01-14T11:16:51+05:30
 Description: ""
 Tags: []
 Categories: []
 DisableComments: false
 ---
+
 ## # Summary
 While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path transversal vulnerability.
 Abode reader was also using Google play core library for dynamic code loading. using path transversal bug and dynamic code loading, i was able to acheive remote code execution.
@@ -178,6 +179,11 @@ public static String getModifiedFileNameWithExtensionUsingIntentData(String str,
 
 Have a nice day! and if you got any doubt you can contact me on Twitter.
 
+#### Timeline
+- Jul 29th,2021 - Reported the vulnerability
+- Aug 4th ,2021 - report traiged
+- Oct 13th,2021 - Vulnerability Fixed
+- Dec 4th ,2021 - $10000 bounty awarded from GPSRP
 
 
 
