@@ -8,10 +8,10 @@ DisableComments: false
 ---
 
 ## # Summary
-While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path transversal vulnerability.
-Abode reader was also using Google play core library for dynamic code loading. using path transversal bug and dynamic code loading,i was able to acheive remote code execution.
+While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path traversal vulnerability.
+Abode reader was also using Google play core library for dynamic code loading. using path traversal bug and dynamic code loading,i was able to acheive remote code execution.
 
-## # Finding Path transversal vulnerability
+## # Finding Path traversal vulnerability
 
 ```
         <activity android:theme="@style/Theme_Virgo_SplashScreen" android:name="com.adobe.reader.AdobeReader" android:exported="true" android:launchMode="singleTask" android:screenOrientation="user" android:configChanges="keyboardHidden|screenLayout|screenSize|smallestScreenSize" android:noHistory="false" android:resizeableActivity="true">
@@ -90,16 +90,16 @@ This method `BBIntentUtils.getModifiedFileNameWithExtensionUsingIntentData` take
 
 For example let take this url `https://localhost/x/..%2F..%2Ffile.pdf` so when this url is passed to getLastPathSegment() method it will take `..%2F..%2Ffile.pdf` as last segment of the url and will return `../../file.pdf` as output.
 
-There was not any sanitization performed in `downloadFile` variable before passing it into  File instance which resulted into path transversal vulnerability.
+There was not any sanitization performed in `downloadFile` variable before passing it into  File instance which resulted into path traversal vulnerability.
 
 ## # Getting RCE
 Adobe Acrobat Reader app was using Google play core library to provide additional feature on the go to its users. 
 
 A simple way to know whether an app is using play core library for dynamic code loading is to check for `spiltcompat` directory in `/data/data/:application_id/files/` directory.
 
-Using path transversal bug i can write an arbitrary apk in `/data/data/com.adobe.reader/files/splitcompat/1921618197/verified-splits/` directory of the app.The classes from the attacker’s apk would automatically be added to the ClassLoader of the app and malicious code will be executed when called from the app. For more detailed explanation read this [article](https://blog.oversecured.com/Why-dynamic-code-loading-could-be-dangerous-for-your-apps-a-Google-example/)
+Using path traversal bug i can write an arbitrary apk in `/data/data/com.adobe.reader/files/splitcompat/1921618197/verified-splits/` directory of the app.The classes from the attacker’s apk would automatically be added to the ClassLoader of the app and malicious code will be executed when called from the app. For more detailed explanation read this [article](https://blog.oversecured.com/Why-dynamic-code-loading-could-be-dangerous-for-your-apps-a-Google-example/)
 
-Adobe reader app also downloads an module name `FASOpenCVDF.apk` during runtime of app. The plan was to overwrite this file and acheive code execution remotely, but this was not possible. The issue was with this path transversal vulnerability i  could not write over existing files... only create new files. 
+Adobe reader app also downloads an module name `FASOpenCVDF.apk` during runtime of app. The plan was to overwrite this file and acheive code execution remotely, but this was not possible. The issue was with this path traversal vulnerability i  could not write over existing files... only create new files. 
 
 I was stuck at this stage for a long time finding a way to gain code execution remotely without installing an additional apk. After analysing other apps using play core library installed on my device, i saw play core library also provide feature of loading native code(.so files) from  `/data/data/com.adobe.reader/files/splitcompat/:id/native-libraries/` directory.
 
