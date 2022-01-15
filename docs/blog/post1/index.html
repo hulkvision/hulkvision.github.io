@@ -87,7 +87,7 @@
 <meta name="twitter:image" content="http://hulkvision.gitlab.io/featured-image.png"/>
 
 <meta name="twitter:title" content="RCE in Adobe Acrobat Reader for android(CVE-2021-40724)"/>
-<meta name="twitter:description" content="# Summary While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path transversal vulnerability. Abode reader was also using Google play core library for dynamic code loading. using path transversal bug and dynamic code loading,i was able to acheive remote code execution."/>
+<meta name="twitter:description" content="# Summary While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path traversal vulnerability. Abode reader was also using Google play core library for dynamic code loading. using path traversal bug and dynamic code loading,i was able to acheive remote code execution."/>
 
 
 
@@ -108,7 +108,7 @@
         "alternativeHeadline": "",
         "description": "
       
-        # Summary While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http\/https url. This feature was vulnerable to path transversal vulnerability. Abode reader was also using Google play core library for dynamic code loading. using path transversal bug and dynamic code loading,i was able to acheive remote code execution.
+        # Summary While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http\/https url. This feature was vulnerable to path traversal vulnerability. Abode reader was also using Google play core library for dynamic code loading. using path traversal bug and dynamic code loading,i was able to acheive remote code execution.
 
 
       
@@ -333,9 +333,9 @@
 
         
       </div><h2 id="-summary"># Summary</h2>
-<p>While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path transversal vulnerability.
-Abode reader was also using Google play core library for dynamic code loading. using path transversal bug and dynamic code loading,i was able to acheive remote code execution.</p>
-<h2 id="-finding-path-transversal-vulnerability"># Finding Path transversal vulnerability</h2>
+<p>While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path traversal vulnerability.
+Abode reader was also using Google play core library for dynamic code loading. using path traversal bug and dynamic code loading,i was able to acheive remote code execution.</p>
+<h2 id="-finding-path-traversal-vulnerability"># Finding Path traversal vulnerability</h2>
 <pre tabindex="0"><code>        &lt;activity android:theme=&quot;@style/Theme_Virgo_SplashScreen&quot; android:name=&quot;com.adobe.reader.AdobeReader&quot; android:exported=&quot;true&quot; android:launchMode=&quot;singleTask&quot; android:screenOrientation=&quot;user&quot; android:configChanges=&quot;keyboardHidden|screenLayout|screenSize|smallestScreenSize&quot; android:noHistory=&quot;false&quot; android:resizeableActivity=&quot;true&quot;&gt;
             &lt;intent-filter&gt;
                 &lt;action android:name=&quot;android.intent.action.VIEW&quot;/&gt;
@@ -399,12 +399,12 @@ Abode reader was also using Google play core library for dynamic code loading. u
             //...//
 </code></pre><p>This method <code>BBIntentUtils.getModifiedFileNameWithExtensionUsingIntentData</code> takes this.mUri.getLastPathSegment() as argument and which returns the decoded  last segment in the path of the url.</p>
 <p>For example let take this url <code>https://localhost/x/..%2F..%2Ffile.pdf</code> so when this url is passed to getLastPathSegment() method it will take <code>..%2F..%2Ffile.pdf</code> as last segment of the url and will return <code>../../file.pdf</code> as output.</p>
-<p>There was not any sanitization performed in <code>downloadFile</code> variable before passing it into  File instance which resulted into path transversal vulnerability.</p>
+<p>There was not any sanitization performed in <code>downloadFile</code> variable before passing it into  File instance which resulted into path traversal vulnerability.</p>
 <h2 id="-getting-rce"># Getting RCE</h2>
 <p>Adobe Acrobat Reader app was using Google play core library to provide additional feature on the go to its users.</p>
 <p>A simple way to know whether an app is using play core library for dynamic code loading is to check for <code>spiltcompat</code> directory in <code>/data/data/:application_id/files/</code> directory.</p>
-<p>Using path transversal bug i can write an arbitrary apk in <code>/data/data/com.adobe.reader/files/splitcompat/1921618197/verified-splits/</code> directory of the app.The classes from the attacker’s apk would automatically be added to the ClassLoader of the app and malicious code will be executed when called from the app. For more detailed explanation read this <a href="https://blog.oversecured.com/Why-dynamic-code-loading-could-be-dangerous-for-your-apps-a-Google-example/">article</a></p>
-<p>Adobe reader app also downloads an module name <code>FASOpenCVDF.apk</code> during runtime of app. The plan was to overwrite this file and acheive code execution remotely, but this was not possible. The issue was with this path transversal vulnerability i  could not write over existing files&hellip; only create new files.</p>
+<p>Using path traversal bug i can write an arbitrary apk in <code>/data/data/com.adobe.reader/files/splitcompat/1921618197/verified-splits/</code> directory of the app.The classes from the attacker’s apk would automatically be added to the ClassLoader of the app and malicious code will be executed when called from the app. For more detailed explanation read this <a href="https://blog.oversecured.com/Why-dynamic-code-loading-could-be-dangerous-for-your-apps-a-Google-example/">article</a></p>
+<p>Adobe reader app also downloads an module name <code>FASOpenCVDF.apk</code> during runtime of app. The plan was to overwrite this file and acheive code execution remotely, but this was not possible. The issue was with this path traversal vulnerability i  could not write over existing files&hellip; only create new files.</p>
 <p>I was stuck at this stage for a long time finding a way to gain code execution remotely without installing an additional apk. After analysing other apps using play core library installed on my device, i saw play core library also provide feature of loading native code(.so files) from  <code>/data/data/com.adobe.reader/files/splitcompat/:id/native-libraries/</code> directory.</p>
 <p><code>FASOpenCVDF.apk</code> module was also loading an native library from
 <code>/data/data/com.adobe.reader/files/splitcompat/1921819312/native-libraries/FASOpenCVDF.config.arm64_v8a</code> directory. I decided to take a look into <code>FASOpenCVDF.apk</code> source code and there i founded this module is also trying to load three unavailable libraries <code>libADCComponent.so</code>,<code>libColoradoMobile.so</code> and <code>libopencv_info.so </code> and this solved my issue of executing code remotely.</p>
