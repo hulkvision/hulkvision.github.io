@@ -97,7 +97,7 @@ Adobe Acrobat Reader app was using Google play core library to provide additiona
 
 A simple way to know whether an app is using play core library for dynamic code loading is to check for `spiltcompat` directory in `/data/data/:application_id/files/` directory.
 
-Using path traversal bug i can write an arbitrary apk in `/data/data/com.adobe.reader/files/splitcompat/1921618197/verified-splits/` directory of the app.The classes from the attacker’s apk would automatically be added to the ClassLoader of the app and malicious code will be executed when called from the app. For more detailed explanation read this [article](https://blog.oversecured.com/Why-dynamic-code-loading-could-be-dangerous-for-your-apps-a-Google-example/)
+Using path traversal bug i can write an arbitrary apk in `/data/data/com.adobe.reader/files/splitcompat/1921618197/verified-splits/` directory of the app.The classes from the attacker’s apk would automatically be added to the ClassLoader of the app and malicious code will be executed when called from the app. For more detailed explanation read this [article](file:///data/data/com.yatra.base/shared_prefs/pref_moe.xml)
 
 Adobe reader app also downloads an module name `FASOpenCVDF.apk` during runtime of app. The plan was to overwrite this file and acheive code execution remotely, but this was not possible. The issue was with this path traversal vulnerability i  could not write over existing files... only create new files. 
 
