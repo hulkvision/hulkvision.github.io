@@ -2,30 +2,30 @@
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9"
   xmlns:xhtml="http://www.w3.org/1999/xhtml">
   <url>
-    <loc>https://hulkvision.gitlab.io/tags/android/</loc>
+    <loc>https://hulkvision.github.io/tags/android/</loc>
     <lastmod>2024-09-04T11:16:51+05:30</lastmod>
   </url><url>
-    <loc>https://hulkvision.gitlab.io/blog/</loc>
+    <loc>https://hulkvision.github.io/blog/</loc>
     <lastmod>2024-09-04T11:16:51+05:30</lastmod>
   </url><url>
-    <loc>https://hulkvision.gitlab.io/blog/javascript-interface/exploiting-javascript-interface/</loc>
+    <loc>https://hulkvision.github.io/blog/javascript-interface/exploiting-javascript-interface/</loc>
     <lastmod>2024-09-04T11:16:51+05:30</lastmod>
   </url><url>
-    <loc>https://hulkvision.gitlab.io/</loc>
+    <loc>https://hulkvision.github.io/</loc>
     <lastmod>2024-09-04T11:16:51+05:30</lastmod>
   </url><url>
-    <loc>https://hulkvision.gitlab.io/tags/</loc>
+    <loc>https://hulkvision.github.io/tags/</loc>
     <lastmod>2024-09-04T11:16:51+05:30</lastmod>
   </url><url>
-    <loc>https://hulkvision.gitlab.io/blog/post1/</loc>
+    <loc>https://hulkvision.github.io/blog/post1/</loc>
     <lastmod>2022-01-14T11:16:51+05:30</lastmod>
   </url><url>
-    <loc>https://hulkvision.gitlab.io/archives/</loc>
+    <loc>https://hulkvision.github.io/archives/</loc>
   </url><url>
-    <loc>https://hulkvision.gitlab.io/categories/</loc>
+    <loc>https://hulkvision.github.io/categories/</loc>
   </url><url>
-    <loc>https://hulkvision.gitlab.io/search/</loc>
+    <loc>https://hulkvision.github.io/search/</loc>
   </url><url>
-    <loc>https://hulkvision.gitlab.io/series/</loc>
+    <loc>https://hulkvision.github.io/series/</loc>
   </url>
 </urlset>

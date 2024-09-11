@@ -2,22 +2,22 @@
 <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
   <channel>
     <title>Android on hulkvision</title>
-    <link>https://hulkvision.gitlab.io/tags/android/</link>
+    <link>https://hulkvision.github.io/tags/android/</link>
     <description>Recent content in Android on hulkvision</description>
     <image>
       <title>hulkvision</title>
-      <url>https://hulkvision.gitlab.io/profile.png</url>
-      <link>https://hulkvision.gitlab.io/profile.png</link>
+      <url>https://hulkvision.github.io/profile.png</url>
+      <link>https://hulkvision.github.io/profile.png</link>
     </image>
     <generator>Hugo -- 0.134.0</generator>
     <language>en</language>
     <lastBuildDate>Wed, 04 Sep 2024 11:16:51 +0530</lastBuildDate>
-    <atom:link href="https://hulkvision.gitlab.io/tags/android/index.xml" rel="self" type="application/rss+xml" />
+    <atom:link href="https://hulkvision.github.io/tags/android/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Exploiting JavaScript Interface for Unauthorized Access in a &#39;global&#39; cryptocurrency exchange android app</title>
-      <link>https://hulkvision.gitlab.io/blog/javascript-interface/exploiting-javascript-interface/</link>
+      <link>https://hulkvision.github.io/blog/javascript-interface/exploiting-javascript-interface/</link>
       <pubDate>Wed, 04 Sep 2024 11:16:51 +0530</pubDate>
-      <guid>https://hulkvision.gitlab.io/blog/javascript-interface/exploiting-javascript-interface/</guid>
+      <guid>https://hulkvision.github.io/blog/javascript-interface/exploiting-javascript-interface/</guid>
       <description>&lt;h2 id=&#34;tl-dr&#34;&gt;TL-DR&lt;/h2&gt;
 &lt;p&gt;The application had implemented proper host validation but it was missing validation on scheme part of the uri, which allowed me to open arbitrary url in the app&amp;rsquo;s webview, later on further analysis of the application I found that the webview has exposed some sensitive javascript interfaces which allowed me to perform critical authenticated action like placing a trade order, canceling trade order or deactivating the account.&lt;/p&gt;
 &lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
