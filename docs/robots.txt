@@ -1,0 +1,3 @@
+User-agent: *
+Disallow:
+Sitemap: https://hulkvision.gitlab.io/sitemap.xml
