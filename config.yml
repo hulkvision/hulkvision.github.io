@@ -1,86 +1,179 @@
-baseURL : "http://hulkvision.gitlab.io" #copy-paste your domain here
-languageCode : "en" #used in SEO tags
-title : "hulkvision's Blog" #actual title of the site used in browser tabs as well as SEO
-theme : "anatole" #name of the directory containing theme files
-summarylength : 50 #summary length shown on list pages
-enableRobotsTXT : true #leave true for SEO
-#this file instructs search engine crawlers on how to acess the site
+# If your site is in 'https', then make sure your base url isn't written using 'http' otherwise your sitemap would
+# contain http (as opposeed to https) URLs. This would affect Google indexing of your URLs.
+baseURL: "http://hulkvision.gitlab.io"
+title: hulkvision
+theme: [PaperMod]
 
-params:
-  title : "Hi! I'm Sunny 👋Welcome!" #emphasised  line on the homepage
-  author : "Sunny Gupta"
-  copyright : "2022" #copyright text in the footer
- # description : "Call me Sunny" #introduction line on homepage
-  profilePicture : "profile.png" #the name of the profile img to be displayed (relative to the static folder)
-  keywords : "" #seo keywords for your homepage
-  #favicons are small images displayed in the browser tab similar to app icons
-  favicon : "favicons/" #directory name holding the favicons (relative to the static folder)
-  mainSections : ["blog"]
-  #which folder to use to list posts on the homepage (relative to the content dir)
-  images : ["featured-image.png"] #image used for social media previews
-  doNotLoadAnimations : false #set to true to disable animations
-  postSectionName : "blog" #the slug of the "archives" listing page
-  #uncomment this if you want your site to load in dark-mode by default.
-  # displayMode: "dark"
-
-  ## Social links
-  #the icons are loaded from font-awesome library
-  #find the icon codes here: https://fontawesome.com/icons?d=gallery&p=2
-  # use 'fab' when brand icons, use 'fas' when standard solid icons.
-  socialIcons:
-    - icon : "fab fa-twitter"
-      title : "Twitter"
-      url : "https://twitter.com/hulkvision"
-    # - icon : "fab fa-github"
-    #   title : "GitHub"
-    #   url : "https://github.com/hulkvision/"
-    - icon : "fab fa-linkedin"
-      title : "Linkedin"
-      url : "https://www.linkedin.com/in/hulkvision/"
-    - icon : "fas fa-envelope"
-      title : "e-mail"
-      url : "mailto:hulkvision@protonmail.com"
-
-  # Google Search Console Verification
-  #googleSiteVerify : "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
-  # Read More links for truncated summaries
-  # readMore : true
-
-  ## Math settings
-  math:
-    enable : false  # options: true, false.
-
-## Menu items
-#weight defines which entry is shown first
-menu:
-  main:
-    - name : "Home"
-      identifier : "home"
-      weight : 100
-      url : "/"
-    - name : "Archives"
-      weight : 200
-      identifier : "archives"
-      url : "/blog"
-    - name : "About"
-      weight : 300
-      identifier : "about"
-      url : "/about"
-
-taxonomies:
-  category: categories
-  series: series
-  tag: tags
-
-timeout: 30000
-#required to exit out of long posts requiring lot of processing.
+enableInlineShortcodes: true
+enableRobotsTXT: true
+buildDrafts: false
+buildFuture: false
+buildExpired: false
+enableEmoji: true
+pygmentsUseClasses: true
+mainsections: ["blog", "papermod"]
 
 minify:
   disableXML: true
-  minifyOutput: false
+  # minifyOutput: true
 
-# Google Analytics
-# Hugo supports GA4 V8.20 (latest at the time of writing) onwards.
-#googleAnalytics : "UA-123-45"
+languages:
+  en:
+    languageName: "English"
+    weight: 1
+    taxonomies:
+      category: categories
+      tag: tags
+      series: series
+    menu:
+      main:
+        - name: Blog
+          url: blog/
+          weight: 1
+        - name: Archive
+          url: archives/
+          weight: 2
+        - name: Search
+          url: search/
+          weight: 3
+        - name: Tags
+          url: tags/
+          weight: 4
 
-publishDir: "docs"
+  
+
+outputs:
+  home:
+    - HTML
+    - RSS
+    - JSON
+
+params:
+  env: production # to enable google analytics, opengraph, twitter-cards and schema.
+  description: "Theme PaperMod - https://github.com/adityatelange/hugo-PaperMod"
+  author: Sunny Gupta
+  # author: ["Me", "You"] # multiple authors
+
+  defaultTheme: auto
+  # disableThemeToggle: true
+  ShowShareButtons: true
+  ShowReadingTime: true
+  # disableSpecial1stPost: true
+  displayFullLangName: true
+  ShowPostNavLinks: true
+  ShowBreadCrumbs: true
+  ShowCodeCopyButtons: true
+  ShowRssButtonInSectionTermList: true
+  ShowAllPagesInArchive: true
+  ShowPageNums: true
+  ShowToc: true
+  # comments: false
+  images: ["profile.png"]
+
+  # profileMode:
+  #   enabled: false
+  #   title: hulkvision's blog
+  #   imageUrl: "#"
+  #   imageTitle: my image
+  #   # imageWidth: 120
+  #   # imageHeight: 120
+  #   buttons:
+  #     - name: Archives
+  #       url: archives
+  #     - name: Tags
+  #       url: tags
+
+
+  socialIcons:
+    - name: github
+      title: Github
+      url: "https://github.com/hulkvision"
+    - name: Linkedin
+      title: Linkedin
+      url: "https://www.linkedin.com/in/hulkvision/"
+    - name: X
+      title: Twitter
+      url: "https://x.com/hulkvision"
+    # - name: KoFi
+    #   title: Buy me a Ko-Fi :)
+    #   url: "https://ko-fi.com/xxxxxxx"
+
+  editPost:
+    URL: "https://github.com/hulkvision/hulkvision.github.io/tree/main/content"
+    Text: "Suggest Changes" # edit text
+    appendFilePath: true # to append file path to Edit link
+  
+
+  homeInfoParams:
+    Title: "<img src=profile.png style=\"width: 200px; height: 200px; border-radius: 50%; object-fit: cover;\"></img>hulkvision's Blog"
+    Content: >
+      👋 HI! I'M SUNNY 👋WELCOME!
+    
+
+  # label:
+  # iconSVG: '<svg xmlns="http://www.w3.org/2000/svg" height="25" viewBox="0 -960 960 960" fill="currentColor"><path d="M320-240h320v-80H320v80Zm0-160h320v-80H320v80ZM240-80q-33 0-56.5-23.5T160-160v-640q0-33 23.5-56.5T240-880h320l240 240v480q0 33-23.5 56.5T720-80H240Zm280-520v-200H240v640h480v-440H520ZM240-800v200-200 640-640Z"/></svg>'
+  # text: "Home"
+  # icon: icon.png
+  # iconHeight: 35
+
+  # analytics:
+  #     google:
+  #         SiteVerificationTag: "XYZabc"
+
+  assets:
+    disableHLJS: true
+  #     favicon: "<link / abs url>"
+  #     favicon16x16: "<link / abs url>"
+  #     favicon32x32: "<link / abs url>"
+  #     apple_touch_icon: "<link / abs url>"
+  #     safari_pinned_tab: "<link / abs url>"
+
+  # cover:
+  #     hidden: true # hide everywhere but not in structured data
+  #     hiddenInList: true # hide on list pages and home
+  #     hiddenInSingle: true # hide on single page
+
+  # fuseOpts:
+  #     isCaseSensitive: false
+  #     shouldSort: true
+  #     location: 0
+  #     distance: 1000
+  #     threshold: 0.4
+  #     minMatchCharLength: 0
+  #     keys: ["title", "permalink", "summary", "content"]
+
+markup:
+  goldmark:
+    renderer:
+      unsafe: true
+  highlight:
+    noClasses: false
+    # anchorLineNos: true
+    # codeFences: true
+    # guessSyntax: true
+    # lineNos: true
+    # style: monokai
+
+# privacy:
+#   vimeo:
+#     disabled: false
+#     simple: true
+
+#   twitter:
+#     disabled: false
+#     enableDNT: true
+#     simple: true
+
+#   instagram:
+#     disabled: false
+#     simple: true
+
+#   youtube:
+#     disabled: false
+#     privacyEnhanced: true
+
+services:
+  instagram:
+    disableInlineCSS: true
+  twitter:
+    disableInlineCSS: true
