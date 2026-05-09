@@ -1,0 +1,639 @@
+<!DOCTYPE html>
+<html lang="en" dir="auto" data-theme="auto">
+
+<head><meta charset="utf-8">
+<meta http-equiv="X-UA-Compatible" content="IE=edge">
+<meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+<meta name="robots" content="index, follow">
+<title>Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix) | hulkvision</title>
+<meta name="keywords" content="android, dos, cve">
+<meta name="description" content="Intro
+In December 2025 I decided to try something different, a long pending goal of mine I wanted to start looking at the Android OS itself. I figured the best way to get started was to go through the Android Security Bulletin and study the types of issues being reported and fixed by the Android security team. I went through the December 2025 bulletin and one vulnerability stood out to me, CVE-2025-48631, a critical Denial-of-Service in the notification image decoding pipeline. The fix included a sample malformed GIF which made it very easy to test. What started as a simple reproduction exercise turned into discovering that the fix was incomplete, and that the vulnerability was still triggering on the latest patched version of Android.">
+<meta name="author" content="Sunny Gupta">
+<link rel="canonical" href="https://hulkvision.github.io/blog/android-notification-dos/android-notification-dos/">
+<link crossorigin="anonymous" href="/assets/css/stylesheet.a1a1b118b3e83435265dc39da18e54244bcc0e5481d1d034aadc0c899c51e15c.css" integrity="sha256-oaGxGLPoNDUmXcOdoY5UJEvMDlSB0dA0qtwMiZxR4Vw=" rel="preload stylesheet" as="style">
+<link rel="icon" href="https://hulkvision.github.io/favicon.ico">
+<link rel="icon" type="image/png" sizes="16x16" href="https://hulkvision.github.io/favicon-16x16.png">
+<link rel="icon" type="image/png" sizes="32x32" href="https://hulkvision.github.io/favicon-32x32.png">
+<link rel="apple-touch-icon" href="https://hulkvision.github.io/apple-touch-icon.png">
+<link rel="mask-icon" href="https://hulkvision.github.io/safari-pinned-tab.svg">
+<meta name="theme-color" content="#2e2e33">
+<meta name="msapplication-TileColor" content="#2e2e33">
+<link rel="alternate" hreflang="en" href="https://hulkvision.github.io/blog/android-notification-dos/android-notification-dos/">
+<noscript>
+    <style>
+        #theme-toggle,
+        .top-link {
+            display: none;
+        }
+
+    </style>
+    <style>
+        @media (prefers-color-scheme: dark) {
+            :root {
+                --theme: rgb(29, 30, 32);
+                --entry: rgb(46, 46, 51);
+                --primary: rgb(218, 218, 219);
+                --secondary: rgb(155, 156, 157);
+                --tertiary: rgb(65, 66, 68);
+                --content: rgb(196, 196, 197);
+                --code-block-bg: rgb(46, 46, 51);
+                --code-bg: rgb(55, 56, 62);
+                --border: rgb(51, 51, 51);
+                color-scheme: dark;
+            }
+
+            .list {
+                background: var(--theme);
+            }
+
+            .toc {
+                background: var(--entry);
+            }
+        }
+
+    </style>
+</noscript>
+<script>
+    if (localStorage.getItem("pref-theme") === "dark") {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else if (localStorage.getItem("pref-theme") === "light") {
+       document.querySelector("html").dataset.theme = 'light';
+    } else if (window.matchMedia('(prefers-color-scheme: dark)').matches) {
+        document.querySelector("html").dataset.theme = 'dark';
+    } else {
+        document.querySelector("html").dataset.theme = 'light';
+    }
+
+</script><meta property="og:url" content="https://hulkvision.github.io/blog/android-notification-dos/android-notification-dos/">
+  <meta property="og:site_name" content="hulkvision">
+  <meta property="og:title" content="Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix)">
+  <meta property="og:description" content="Intro In December 2025 I decided to try something different, a long pending goal of mine I wanted to start looking at the Android OS itself. I figured the best way to get started was to go through the Android Security Bulletin and study the types of issues being reported and fixed by the Android security team. I went through the December 2025 bulletin and one vulnerability stood out to me, CVE-2025-48631, a critical Denial-of-Service in the notification image decoding pipeline. The fix included a sample malformed GIF which made it very easy to test. What started as a simple reproduction exercise turned into discovering that the fix was incomplete, and that the vulnerability was still triggering on the latest patched version of Android.">
+  <meta property="og:locale" content="en">
+  <meta property="og:type" content="article">
+    <meta property="article:section" content="blog">
+    <meta property="article:published_time" content="2026-05-09T11:16:51+05:30">
+    <meta property="article:modified_time" content="2026-05-09T11:16:51+05:30">
+    <meta property="article:tag" content="Android">
+    <meta property="article:tag" content="Dos">
+    <meta property="article:tag" content="Cve">
+      <meta property="og:image" content="https://hulkvision.github.io/profile.png">
+
+  <meta name="twitter:card" content="summary_large_image">
+  <meta name="twitter:image" content="https://hulkvision.github.io/profile.png">
+  <meta name="twitter:title" content="Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix)">
+  <meta name="twitter:description" content="Intro In December 2025 I decided to try something different, a long pending goal of mine I wanted to start looking at the Android OS itself. I figured the best way to get started was to go through the Android Security Bulletin and study the types of issues being reported and fixed by the Android security team. I went through the December 2025 bulletin and one vulnerability stood out to me, CVE-2025-48631, a critical Denial-of-Service in the notification image decoding pipeline. The fix included a sample malformed GIF which made it very easy to test. What started as a simple reproduction exercise turned into discovering that the fix was incomplete, and that the vulnerability was still triggering on the latest patched version of Android.">
+
+
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BreadcrumbList",
+  "itemListElement": [
+    {
+      "@type": "ListItem",
+      "position":  1 ,
+      "name": "Blogs",
+      "item": "https://hulkvision.github.io/blog/"
+    }, 
+    {
+      "@type": "ListItem",
+      "position":  2 ,
+      "name": "Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix)",
+      "item": "https://hulkvision.github.io/blog/android-notification-dos/android-notification-dos/"
+    }
+  ]
+}
+</script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "BlogPosting",
+  "headline": "Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix)",
+  "name": "Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix)",
+  "description": "Intro In December 2025 I decided to try something different, a long pending goal of mine I wanted to start looking at the Android OS itself. I figured the best way to get started was to go through the Android Security Bulletin and study the types of issues being reported and fixed by the Android security team. I went through the December 2025 bulletin and one vulnerability stood out to me, CVE-2025-48631, a critical Denial-of-Service in the notification image decoding pipeline. The fix included a sample malformed GIF which made it very easy to test. What started as a simple reproduction exercise turned into discovering that the fix was incomplete, and that the vulnerability was still triggering on the latest patched version of Android.\n",
+  "keywords": [
+    "android", "dos", "cve"
+  ],
+  "articleBody": "Intro In December 2025 I decided to try something different, a long pending goal of mine I wanted to start looking at the Android OS itself. I figured the best way to get started was to go through the Android Security Bulletin and study the types of issues being reported and fixed by the Android security team. I went through the December 2025 bulletin and one vulnerability stood out to me, CVE-2025-48631, a critical Denial-of-Service in the notification image decoding pipeline. The fix included a sample malformed GIF which made it very easy to test. What started as a simple reproduction exercise turned into discovering that the fix was incomplete, and that the vulnerability was still triggering on the latest patched version of Android.\n# CVE-2025-48631 — The Original Fix CVE-2025-48631 was a DoS vulnerability in LocalImageResolver.java. The issue was that the image decoder had no hard limit on the dimensions of images it would process. An attacker could send a notification containing a GIF with maximum GIF dimensions (65535×65535 pixels) and the device would attempt to decode it, exhausting all available memory and crashing.\nThe fix Google introduced added a constant DEFAULT_DECODE_HARD_LIMIT_PX = 4096 and a check in the onHeaderDecoded() listener that throws a RuntimeException if either dimension of the image exceeds 4096 pixels. The fix also included a test GIF with 16000×16000 dimensions to verify the exception is raised properly.\nReproducing this seemed like the simplest starting point for me. I create a sample oversized image with 65535x65535 dimension and sent it to a device running a firmware version before the December patch, and the device crashed. SystemUI went down, restarted, and I could recover by rebooting. That was the expected behavior.\n# The Surprise — Still Crashing on the December Patch Then I tried the same thing on a device running the December 2025 security patch. I expected it to be fine. It was not.\nThe device crashed the same way — SystemUI went down and kept restarting. I pulled the logcat and this is what I saw:\nSystem.err: java.io.IOException: java.lang.RuntimeException: Image dimensions (65535x65535) exceed the maximum allowed size. So the fix IS triggering. The dimension check is being hit. The exception is being thrown. And yet the device is still crashing. That was confusing enough that I decided I had to dig deeper.\n# Root Cause — The Incomplete Fix The fix for CVE-2025-48631 added the dimension check, but it was not added to the private method resolveImage(ImageDecoder.Source, int, int) inside LocalImageResolver.java at lines 219–251. This is the exact method that gets called when a notification image is decoded through the notification pipeline.\n// Line 219–251 — VULNERABLE private static Drawable resolveImage(ImageDecoder.Source source, int maxWidth, int maxHeight) { try { return ImageDecoder.decodeDrawable(source, (decoder, info, unused) -\u003e { if (maxWidth \u003c= 0 || maxHeight \u003c= 0) { // Never true in attack path return; } final Size size = info.getSize(); if (size.getWidth() \u003c= maxWidth \u0026\u0026 size.getHeight() \u003c= maxHeight) { return; // No scaling needed } // Scaling logic if (size.getWidth() \u003e size.getHeight()) { if (size.getWidth() \u003e maxWidth) { final int targetHeight = size.getHeight() * maxWidth / size.getWidth(); decoder.setTargetSize(maxWidth, targetHeight); } } else { if (size.getHeight() \u003e maxHeight) { final int targetWidth = size.getWidth() * maxHeight / size.getHeight(); decoder.setTargetSize(targetWidth, maxHeight); } } }); } catch (IOException | Resources.NotFoundException e) { Log.d(TAG, \"Couldn't use ImageDecoder for drawable, falling back to non-resized load.\"); return null; } } The method calls decoder.setTargetSize(480, 480) which changes mDesiredWidth and mDesiredHeight inside ImageDecoder. The problem is that this does not stop the underlying native codec from allocating a full-resolution internal buffer for the source image.\nLooking at the native side in ImageDecoder.cpp:\n// https://cs.android.com/android/platform/superproject/+/android-latest-release:frameworks/base/libs/hwui/jni/ImageDecoder.cpp;l=337-358 static jobject ImageDecoder_nDecodeBitmap(JNIEnv* env, jobject /*clazz*/, jlong nativePtr, ...) { SkImageInfo bitmapInfo = decoder-\u003egetOutputInfo(); //...// SkBitmap bm; if (!bm.setInfo(bitmapInfo)) { // sets info to 480x480 doThrowIOE(env, \"Failed to setInfo properly\"); return nullptr; } sk_sp\u003cBitmap\u003e nativeBitmap; //...// nativeBitmap = Bitmap::allocateHeapBitmap(\u0026bm); // allocates 480×480×4 = ~0.87 MB //...// SkCodec::Result result = decoder-\u003edecode(bm.getPixels(), bm.rowBytes()); // OOM OCCURS HERE And inside hwui/ImageDecoder.cpp:\n// https://cs.android.com/android/platform/superproject/+/android-latest-release:frameworks/base/libs/hwui/hwui/ImageDecoder.cpp;l=398-451 if (scale || handleOrigin || mCropRect) { SkBitmap tmp; if (!tmp.setInfo(decodeInfo.makeAlphaType(...))) // L446: sets to 65535×65535 { return SkCodec::kInternalError; } if (!Bitmap::allocateHeapBitmap(\u0026tmp)) { // L451: ALLOCATES 65535×65535×4 = ~16 GB return SkCodec::kInternalError; // Returns kInternalError, not OOM } decodePixels = tmp.getPixels(); decodeRowBytes = tmp.rowBytes(); } For codecs that do not support native downsampling — GIF and PNG being the main ones — the native decoder has to allocate a full-resolution internal pixel buffer before it can scale down to the target size. 65535 × 65535 × 4 bytes is around 16 GB. The device does not have 16 GB of RAM. The OOM happens at the native layer before the target size even gets applied.\n# Attack Chain Attacker sends malicious GIF via Google Messages (RCS) │ ▼ NotificationManagerService enqueues the notification │ ▼ SystemUI receives the notification │ ▼ NotificationInlineImageResolver.resolveImage(Uri uri) ← L124 └── LocalImageResolver.resolveImage(uri, context, maxW, maxH) ← L155 └── resolveImage(source, maxWidth, maxHeight) ← L219 ★ VULNERABLE ★ └── ImageDecoder.decodeDrawable(source, listener)← L221 └── callHeaderDecoded(listener, src) [sets targetSize to 480] └── decodeBitmapInternal() / AnimatedImageDrawable() └── nDecodeBitmap(65535×65535 → OOM) The victim just needs to receive the message. No interaction needed. SystemUI crashes and restarts, and on restart it re-processes the cached notification in Google Messages, which triggers the same crash again. On flagship devices with more RAM the crash loop had a 5–6 second delay between each cycle, visible as a flickering UI. On lower-RAM devices it was crashing and restarting almost instantly.\nThe worst part is that Google Messages notifications persist after reboot, so the crash loop resumes every time the device boots up. The device becomes stuck in a loop until the message is cleared, which is not straightforward when the UI keeps crashing.\nHere is the PoC — from a second device I send an RCS message with the malformed GIF to the victim device, and this is what happens:\n# Suggested Fix The fix is to add the hard dimension limit check inside the onHeaderDecoded listener in resolveImage, before any scaling logic runs, and to also add RuntimeException to the catch block so a dimension rejection is handled gracefully:\nprivate static Drawable resolveImage(ImageDecoder.Source source, int maxWidth, int maxHeight) { try { return ImageDecoder.decodeDrawable(source, (decoder, info, unused) -\u003e { + final Size size = info.getSize(); + + if (size.getWidth() \u003e DEFAULT_DECODE_HARD_LIMIT_PX + || size.getHeight() \u003e DEFAULT_DECODE_HARD_LIMIT_PX) { + throw new RuntimeException( + \"Image dimensions (\" + size.getWidth() + \"x\" + size.getHeight() + + \") exceed the maximum allowed size.\"); + } + if (maxWidth \u003c= 0 || maxHeight \u003c= 0) { return; } - final Size size = info.getSize(); if (size.getWidth() \u003c= maxWidth \u0026\u0026 size.getHeight() \u003c= maxHeight) { return; } // ... rest of scaling logic unchanged ... }); - } catch (IOException | Resources.NotFoundException e) { + } catch (IOException | Resources.NotFoundException | RuntimeException e) { Log.d(TAG, \"Couldn't use ImageDecoder for drawable, falling back to non-resized load.\"); return null; } } # Reporting to Google — Round One I filed the report on December 17, 2025. The device used for testing was:\ngoogle/akita/akita:16/CP1A.260305.018/14887507:user/release-keys Google’s initial response:\nWhen we first received your report, our team initially saw some stability issues. However, during further investigation by our engineers, we were unable to reproduce the persistent crash or the device being locked out on the latest versions of Android. On current software, the system correctly identifies and handles images that exceed the allowed size.\nBecause we could not confirm the security impact on current builds, we decided this does not qualify as a security vulnerability. However, we really appreciate the time and effort you put into this report. To recognize your hard work, we have decided to keep your reward at the “Critical” level.\nThen on January 8, 2026 Google quietly updated the December security bulletin:\nCVE-2025-48631 has been removed due to an incomplete fix for Android 16 25Q4, all other Android versions are fine. Partners may keep this fix. An updated fix will be required as part of ASB#2026-03 Android Security Bulletin.\nWhen I saw this I assumed they had internally identified the same root cause I found and that the March 2026 patch would include a proper fix.\n# March 2026 — Still Not Fixed March 2026 security bulletin dropped. I checked the patch. No additional fix was introduced for this code path. I tested on the latest March build and the vulnerability was still triggering. I filed the report again with the full root cause analysis, the native code path, the suggested fix, and the PoC video showing the crash loop on the latest patched build.\nGoogle’s response this time:\nAfter a thorough technical assessment by our engineering team, the determination remains that this issue will be closed as Won’t Fix.\nTheir reasoning was the same as before — they were unable to reproduce the persistent crash loop on current software builds.\nI pushed back. I pointed out that the PoC video shows the crash happening on the March 2026 security patch and that triggering a remote crash loop, even if it is recoverable, should be considered a security impact. A remote attacker being able to brick your phone for the duration of a message existing in your inbox is not nothing.\nOn the question of disclosure, Google gave me the green light:\nSince we do not have a pending remediation for this issue, you are welcome to proceed with your blog post. We appreciate the high quality of your research and the detail you put into your root cause analysis.\nSo here we are.\n# Closing Thoughts My main issue with the outcome is the framing around “persistent crash loop.” On my test devices I reproduced a persistent crash loop triggered by receiving a single RCS message, requiring only a reboot and clearing the notification to recover, but the fact that the device is unusable until that is done and that the crash re-triggers on boot is not a benign stability issue in my view. The attack surface is zero-click and reachable via any messaging app that generates MessagingStyle notifications and supports MMS/RCS.\nThe incomplete fix story is also worth paying attention to. CVE-2025-48631 was patched, pulled from the bulletin, re-scheduled for March, never shipped. The private resolveImage method at L219 still does not have the dimension guard. If you are on Android and using Google Messages today, this is still the state of the code.\nAnyway, I learned a lot going through the AOSP source and the native decoder internals, and that was the whole point of starting this research. Hopefully this writeup is useful to someone. See you in the next one.\nTimeline Dec 2025 — Began reviewing the December 2025 Android Security Bulletin Dec 17, 2025 — First report filed with Android Security Team (issue tracker: https://issuetracker.google.com/issues/469775511) Jan 2026 — Google responds: unable to reproduce persistent crash, awards “Critical” reward anyway Jan 8, 2026 — Google removes CVE-2025-48631 from December bulletin; notes incomplete fix for Android 16 25Q4, fix rescheduled for March 2026 ASB Mar 2026 — March security bulletin ships with no fix for this code path Mar 2026 — Second report filed with updated root cause, PoC on latest March build May 2026 — Google closes as Won’t Fix; authorizes public disclosure ",
+  "wordCount" : "1872",
+  "inLanguage": "en",
+  "image": "https://hulkvision.github.io/profile.png","datePublished": "2026-05-09T11:16:51+05:30",
+  "dateModified": "2026-05-09T11:16:51+05:30",
+  "author":{
+    "@type": "Person",
+    "name": "Sunny Gupta"
+  },
+  "mainEntityOfPage": {
+    "@type": "WebPage",
+    "@id": "https://hulkvision.github.io/blog/android-notification-dos/android-notification-dos/"
+  },
+  "publisher": {
+    "@type": "Organization",
+    "name": "hulkvision",
+    "logo": {
+      "@type": "ImageObject",
+      "url": "https://hulkvision.github.io/favicon.ico"
+    }
+  }
+}
+</script>
+</head>
+<body id="top">
+    <header class="header">
+    <nav class="header-nav">
+        <div class="logo">
+            <a href="https://hulkvision.github.io/" accesskey="h" title="hulkvision (Alt + H)">hulkvision</a>
+            <div class="logo-switches">
+                <button id="theme-toggle" class="theme-toggle" accesskey="t" title="(Alt + T)" aria-label="Toggle theme">
+                    <svg class="moon" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <path d="M21 12.79A9 9 0 1 1 11.21 3 7 7 0 0 0 21 12.79z"></path>
+                    </svg>
+                    <svg class="sun" xmlns="http://www.w3.org/2000/svg" width="17" height="17" viewBox="0 0 24 24"
+                        fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"
+                        stroke-linejoin="round">
+                        <circle cx="12" cy="12" r="5"></circle>
+                        <line x1="12" y1="1" x2="12" y2="3"></line>
+                        <line x1="12" y1="21" x2="12" y2="23"></line>
+                        <line x1="4.22" y1="4.22" x2="5.64" y2="5.64"></line>
+                        <line x1="18.36" y1="18.36" x2="19.78" y2="19.78"></line>
+                        <line x1="1" y1="12" x2="3" y2="12"></line>
+                        <line x1="21" y1="12" x2="23" y2="12"></line>
+                        <line x1="4.22" y1="19.78" x2="5.64" y2="18.36"></line>
+                        <line x1="18.36" y1="5.64" x2="19.78" y2="4.22"></line>
+                    </svg>
+                </button>
+            </div>
+        </div>
+        <ul id="menu" class="menu">
+            <li>
+                <a href="https://hulkvision.github.io/blog/" title="Blog">
+                    <span>Blog</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://hulkvision.github.io/archives/" title="Archive">
+                    <span>Archive</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://hulkvision.github.io/search/" title="Search (Alt &#43; /)" accesskey=/>
+                    <span>Search</span>
+                </a>
+            </li>
+            <li>
+                <a href="https://hulkvision.github.io/tags/" title="Tags">
+                    <span>Tags</span>
+                </a>
+            </li>
+        </ul>
+    </nav>
+</header>
+<main class="main">
+
+<article class="post-single">
+  <header class="post-header">
+    <nav class="breadcrumbs" role="navigation" aria-label="Breadcrumb">
+            <a href="/">Home</a>
+            <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+                stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg>
+            <a href="/blog/">Blogs</a>
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevron-right">
+        <polyline points="9 18 15 12 9 6"></polyline>
+    </svg>
+</nav>
+    <h1 class="post-title entry-hint-parent">
+      Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix)
+    </h1>
+    <div class="post-meta">
+
+<span title='2026-05-09 11:16:51 +0530 IST'>May 9, 2026</span>&nbsp;·&nbsp;<span>9 min</span>&nbsp;·&nbsp;<span>Sunny Gupta</span>&nbsp;|&nbsp;<span>
+        <a href="https://github.com/hulkvision/hulkvision.github.io/tree/main/content/blog/android-notification-dos/android-notification-dos.md" rel="noopener noreferrer edit" target="_blank">Suggest Changes</a>
+    </span>
+
+</div>
+  </header> <details class="toc" >
+    <summary accesskey="c" title="(Alt + C)">
+        <span class="title">Table of Contents</span>
+    </summary>
+
+    <div class="inner"><ul>
+            <li>
+                <a href="#intro" aria-label="Intro">Intro</a></li>
+            <li>
+                <a href="#-cve-2025-48631--the-original-fix" aria-label="# CVE-2025-48631 — The Original Fix"># CVE-2025-48631 — The Original Fix</a></li>
+            <li>
+                <a href="#-the-surprise--still-crashing-on-the-december-patch" aria-label="# The Surprise — Still Crashing on the December Patch"># The Surprise — Still Crashing on the December Patch</a></li>
+            <li>
+                <a href="#-root-cause--the-incomplete-fix" aria-label="# Root Cause — The Incomplete Fix"># Root Cause — The Incomplete Fix</a></li>
+            <li>
+                <a href="#-attack-chain" aria-label="# Attack Chain"># Attack Chain</a></li>
+            <li>
+                <a href="#-suggested-fix" aria-label="# Suggested Fix"># Suggested Fix</a></li>
+            <li>
+                <a href="#-reporting-to-google--round-one" aria-label="# Reporting to Google — Round One"># Reporting to Google — Round One</a></li>
+            <li>
+                <a href="#-march-2026--still-not-fixed" aria-label="# March 2026 — Still Not Fixed"># March 2026 — Still Not Fixed</a></li>
+            <li>
+                <a href="#-closing-thoughts" aria-label="# Closing Thoughts"># Closing Thoughts</a><ul>
+                    <ul>
+                    
+            <li>
+                <a href="#timeline" aria-label="Timeline">Timeline</a>
+            </li>
+        </ul>
+        </ul>
+        </li>
+        </ul>
+    </div>
+</details>
+
+  <div class="post-content md-content"><h2 id="intro">Intro<a hidden class="anchor" aria-hidden="true" href="#intro">#</a></h2>
+<p>In December 2025 I decided to try something different, a long pending goal of mine I wanted to start looking at the Android OS itself. I figured the best way to get started was to go through the Android Security Bulletin and study the types of issues being reported and fixed by the Android security team. I went through the December 2025 bulletin and one vulnerability stood out to me, CVE-2025-48631, a critical Denial-of-Service in the notification image decoding pipeline. The fix included a sample malformed GIF which made it very easy to test. What started as a simple reproduction exercise turned into discovering that the fix was incomplete, and that the vulnerability was still triggering on the latest patched version of Android.</p>
+<h2 id="-cve-2025-48631--the-original-fix"># CVE-2025-48631 — The Original Fix<a hidden class="anchor" aria-hidden="true" href="#-cve-2025-48631--the-original-fix">#</a></h2>
+<p>CVE-2025-48631 was a DoS vulnerability in <code>LocalImageResolver.java</code>. The issue was that the image decoder had no hard limit on the dimensions of images it would process. An attacker could send a notification containing a GIF with maximum GIF dimensions (65535×65535 pixels) and the device would attempt to decode it, exhausting all available memory and crashing.</p>
+<p>The fix Google introduced added a constant <code>DEFAULT_DECODE_HARD_LIMIT_PX = 4096</code> and a check in the <code>onHeaderDecoded()</code> listener that throws a <code>RuntimeException</code> if either dimension of the image exceeds 4096 pixels. The fix also included a test GIF with 16000×16000 dimensions to verify the exception is raised properly.</p>
+<p>Reproducing this seemed like the simplest starting point for me. I create a sample oversized image with 65535x65535 dimension and sent it to a device running a firmware version before the December patch, and the device crashed. SystemUI went down, restarted, and I could recover by rebooting. That was the expected behavior.</p>
+<h2 id="-the-surprise--still-crashing-on-the-december-patch"># The Surprise — Still Crashing on the December Patch<a hidden class="anchor" aria-hidden="true" href="#-the-surprise--still-crashing-on-the-december-patch">#</a></h2>
+<p>Then I tried the same thing on a device running the December 2025 security patch. I expected it to be fine. It was not.</p>
+<p>The device crashed the same way — SystemUI went down and kept restarting. I pulled the logcat and this is what I saw:</p>
+<pre tabindex="0"><code>System.err: java.io.IOException: java.lang.RuntimeException: Image dimensions (65535x65535) exceed the maximum allowed size.
+</code></pre><p>So the fix IS triggering. The dimension check is being hit. The exception is being thrown. And yet the device is still crashing. That was confusing enough that I decided I had to dig deeper.</p>
+<h2 id="-root-cause--the-incomplete-fix"># Root Cause — The Incomplete Fix<a hidden class="anchor" aria-hidden="true" href="#-root-cause--the-incomplete-fix">#</a></h2>
+<p>The fix for CVE-2025-48631 added the dimension check, but it was not added to the private method <code>resolveImage(ImageDecoder.Source, int, int)</code> inside <code>LocalImageResolver.java</code> at lines 219–251. This is the exact method that gets called when a notification image is decoded through the notification pipeline.</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="c1">// Line 219–251 — VULNERABLE</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Drawable</span><span class="w"> </span><span class="nf">resolveImage</span><span class="p">(</span><span class="n">ImageDecoder</span><span class="p">.</span><span class="na">Source</span><span class="w"> </span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">maxWidth</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">maxHeight</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="n">ImageDecoder</span><span class="p">.</span><span class="na">decodeDrawable</span><span class="p">(</span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span><span class="w"> </span><span class="n">info</span><span class="p">,</span><span class="w"> </span><span class="n">unused</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">maxWidth</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">maxHeight</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">   </span><span class="c1">// Never true in attack path</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">return</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="kd">final</span><span class="w"> </span><span class="n">Size</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="p">.</span><span class="na">getSize</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">.</span><span class="na">getWidth</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">maxWidth</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="na">getHeight</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">maxHeight</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">return</span><span class="p">;</span><span class="w">  </span><span class="c1">// No scaling needed</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="c1">// Scaling logic</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">.</span><span class="na">getWidth</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="na">getHeight</span><span class="p">())</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">.</span><span class="na">getWidth</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">maxWidth</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">targetHeight</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="na">getHeight</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">maxWidth</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="na">getWidth</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">decoder</span><span class="p">.</span><span class="na">setTargetSize</span><span class="p">(</span><span class="n">maxWidth</span><span class="p">,</span><span class="w"> </span><span class="n">targetHeight</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w"> </span><span class="k">else</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">.</span><span class="na">getHeight</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">maxHeight</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="kd">final</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">targetWidth</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="na">getWidth</span><span class="p">()</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">maxHeight</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="na">getHeight</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                    </span><span class="n">decoder</span><span class="p">.</span><span class="na">setTargetSize</span><span class="p">(</span><span class="n">targetWidth</span><span class="p">,</span><span class="w"> </span><span class="n">maxHeight</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Resources</span><span class="p">.</span><span class="na">NotFoundException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="n">Log</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;Couldn&#39;t use ImageDecoder for drawable, falling back to non-resized load.&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">        </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">    </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><p>The method calls <code>decoder.setTargetSize(480, 480)</code> which changes <code>mDesiredWidth</code> and <code>mDesiredHeight</code> inside <code>ImageDecoder</code>. The problem is that this does not stop the underlying native codec from allocating a full-resolution internal buffer for the source image.</p>
+<p>Looking at the native side in <code>ImageDecoder.cpp</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// https://cs.android.com/android/platform/superproject/+/android-latest-release:frameworks/base/libs/hwui/jni/ImageDecoder.cpp;l=337-358
+</span></span></span><span class="line"><span class="cl"><span class="k">static</span> <span class="n">jobject</span> <span class="nf">ImageDecoder_nDecodeBitmap</span><span class="p">(</span><span class="n">JNIEnv</span><span class="o">*</span> <span class="n">env</span><span class="p">,</span> <span class="n">jobject</span> <span class="cm">/*clazz*/</span><span class="p">,</span> <span class="n">jlong</span> <span class="n">nativePtr</span><span class="p">,</span> <span class="p">...)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SkImageInfo</span> <span class="n">bitmapInfo</span> <span class="o">=</span> <span class="n">decoder</span><span class="o">-&gt;</span><span class="n">getOutputInfo</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//...//
+</span></span></span><span class="line"><span class="cl">    <span class="n">SkBitmap</span> <span class="n">bm</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">bm</span><span class="p">.</span><span class="n">setInfo</span><span class="p">(</span><span class="n">bitmapInfo</span><span class="p">))</span> <span class="p">{</span>  <span class="c1">// sets info to 480x480
+</span></span></span><span class="line"><span class="cl">        <span class="n">doThrowIOE</span><span class="p">(</span><span class="n">env</span><span class="p">,</span> <span class="s">&#34;Failed to setInfo properly&#34;</span><span class="p">);</span>
+</span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="k">nullptr</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="n">sk_sp</span><span class="o">&lt;</span><span class="n">Bitmap</span><span class="o">&gt;</span> <span class="n">nativeBitmap</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="c1">//...//
+</span></span></span><span class="line"><span class="cl">    <span class="n">nativeBitmap</span> <span class="o">=</span> <span class="n">Bitmap</span><span class="o">::</span><span class="n">allocateHeapBitmap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">bm</span><span class="p">);</span> <span class="c1">// allocates 480×480×4 = ~0.87 MB
+</span></span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="c1">//...//
+</span></span></span><span class="line"><span class="cl">    <span class="n">SkCodec</span><span class="o">::</span><span class="n">Result</span> <span class="n">result</span> <span class="o">=</span> <span class="n">decoder</span><span class="o">-&gt;</span><span class="n">decode</span><span class="p">(</span><span class="n">bm</span><span class="p">.</span><span class="n">getPixels</span><span class="p">(),</span> <span class="n">bm</span><span class="p">.</span><span class="n">rowBytes</span><span class="p">());</span> <span class="c1">// OOM OCCURS HERE
+</span></span></span></code></pre></div><p>And inside <code>hwui/ImageDecoder.cpp</code>:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-cpp" data-lang="cpp"><span class="line"><span class="cl"><span class="c1">// https://cs.android.com/android/platform/superproject/+/android-latest-release:frameworks/base/libs/hwui/hwui/ImageDecoder.cpp;l=398-451
+</span></span></span><span class="line"><span class="cl"><span class="k">if</span> <span class="p">(</span><span class="n">scale</span> <span class="o">||</span> <span class="n">handleOrigin</span> <span class="o">||</span> <span class="n">mCropRect</span><span class="p">)</span> <span class="p">{</span>
+</span></span><span class="line"><span class="cl">    <span class="n">SkBitmap</span> <span class="n">tmp</span><span class="p">;</span>
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">tmp</span><span class="p">.</span><span class="n">setInfo</span><span class="p">(</span><span class="n">decodeInfo</span><span class="p">.</span><span class="n">makeAlphaType</span><span class="p">(...)))</span>  <span class="c1">// L446: sets to 65535×65535
+</span></span></span><span class="line"><span class="cl">        <span class="p">{</span> <span class="k">return</span> <span class="n">SkCodec</span><span class="o">::</span><span class="n">kInternalError</span><span class="p">;</span> <span class="p">}</span>
+</span></span><span class="line"><span class="cl">
+</span></span><span class="line"><span class="cl">    <span class="k">if</span> <span class="p">(</span><span class="o">!</span><span class="n">Bitmap</span><span class="o">::</span><span class="n">allocateHeapBitmap</span><span class="p">(</span><span class="o">&amp;</span><span class="n">tmp</span><span class="p">))</span> <span class="p">{</span>           <span class="c1">// L451: ALLOCATES 65535×65535×4 = ~16 GB
+</span></span></span><span class="line"><span class="cl">        <span class="k">return</span> <span class="n">SkCodec</span><span class="o">::</span><span class="n">kInternalError</span><span class="p">;</span>                <span class="c1">// Returns kInternalError, not OOM
+</span></span></span><span class="line"><span class="cl">    <span class="p">}</span>
+</span></span><span class="line"><span class="cl">    <span class="n">decodePixels</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">.</span><span class="n">getPixels</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl">    <span class="n">decodeRowBytes</span> <span class="o">=</span> <span class="n">tmp</span><span class="p">.</span><span class="n">rowBytes</span><span class="p">();</span>
+</span></span><span class="line"><span class="cl"><span class="p">}</span>
+</span></span></code></pre></div><p>For codecs that do not support native downsampling — GIF and PNG being the main ones — the native decoder has to allocate a full-resolution internal pixel buffer before it can scale down to the target size. 65535 × 65535 × 4 bytes is around 16 GB. The device does not have 16 GB of RAM. The OOM happens at the native layer before the target size even gets applied.</p>
+<h2 id="-attack-chain"># Attack Chain<a hidden class="anchor" aria-hidden="true" href="#-attack-chain">#</a></h2>
+<pre tabindex="0"><code>Attacker sends malicious GIF via Google Messages (RCS)
+        │
+        ▼
+NotificationManagerService enqueues the notification
+        │
+        ▼
+SystemUI receives the notification
+        │
+        ▼
+NotificationInlineImageResolver.resolveImage(Uri uri)               ← L124
+    └── LocalImageResolver.resolveImage(uri, context, maxW, maxH)   ← L155
+            └── resolveImage(source, maxWidth, maxHeight)            ← L219  ★ VULNERABLE ★
+                    └── ImageDecoder.decodeDrawable(source, listener)← L221
+                            └── callHeaderDecoded(listener, src)     [sets targetSize to 480]
+                            └── decodeBitmapInternal() / AnimatedImageDrawable()
+                                    └── nDecodeBitmap(65535×65535 → OOM)
+</code></pre><p>The victim just needs to receive the message. No interaction needed. SystemUI crashes and restarts, and on restart it re-processes the cached notification in Google Messages, which triggers the same crash again. On flagship devices with more RAM the crash loop had a 5–6 second delay between each cycle, visible as a flickering UI. On lower-RAM devices it was crashing and restarting almost instantly.</p>
+<p>The worst part is that Google Messages notifications persist after reboot, so the crash loop resumes every time the device boots up. The device becomes stuck in a loop until the message is cleared, which is not straightforward when the UI keeps crashing.</p>
+<p>Here is the PoC — from a second device I send an RCS message with the malformed GIF to the victim device, and this is what happens:</p>
+<p><video src=/android-notification-dos/poc.mp4 width="480" height="320" controls></video></p>
+<h2 id="-suggested-fix"># Suggested Fix<a hidden class="anchor" aria-hidden="true" href="#-suggested-fix">#</a></h2>
+<p>The fix is to add the hard dimension limit check inside the <code>onHeaderDecoded</code> listener in <code>resolveImage</code>, before any scaling logic runs, and to also add <code>RuntimeException</code> to the catch block so a dimension rejection is handled gracefully:</p>
+<div class="highlight"><pre tabindex="0" class="chroma"><code class="language-java" data-lang="java"><span class="line"><span class="cl"><span class="w"> </span><span class="kd">private</span><span class="w"> </span><span class="kd">static</span><span class="w"> </span><span class="n">Drawable</span><span class="w"> </span><span class="nf">resolveImage</span><span class="p">(</span><span class="n">ImageDecoder</span><span class="p">.</span><span class="na">Source</span><span class="w"> </span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">maxWidth</span><span class="p">,</span><span class="w"> </span><span class="kt">int</span><span class="w"> </span><span class="n">maxHeight</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">     </span><span class="k">try</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="n">ImageDecoder</span><span class="p">.</span><span class="na">decodeDrawable</span><span class="p">(</span><span class="n">source</span><span class="p">,</span><span class="w"> </span><span class="p">(</span><span class="n">decoder</span><span class="p">,</span><span class="w"> </span><span class="n">info</span><span class="p">,</span><span class="w"> </span><span class="n">unused</span><span class="p">)</span><span class="w"> </span><span class="o">-&gt;</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">+</span><span class="w">            </span><span class="kd">final</span><span class="w"> </span><span class="n">Size</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="p">.</span><span class="na">getSize</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">+</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">+</span><span class="w">            </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">.</span><span class="na">getWidth</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">DEFAULT_DECODE_HARD_LIMIT_PX</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">+</span><span class="w">                    </span><span class="o">||</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="na">getHeight</span><span class="p">()</span><span class="w"> </span><span class="o">&gt;</span><span class="w"> </span><span class="n">DEFAULT_DECODE_HARD_LIMIT_PX</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">+</span><span class="w">                </span><span class="k">throw</span><span class="w"> </span><span class="k">new</span><span class="w"> </span><span class="n">RuntimeException</span><span class="p">(</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">+</span><span class="w">                        </span><span class="s">&#34;Image dimensions (&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="na">getWidth</span><span class="p">()</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;x&#34;</span><span class="w"> </span><span class="o">+</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="na">getHeight</span><span class="p">()</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">+</span><span class="w">                                </span><span class="o">+</span><span class="w"> </span><span class="s">&#34;) exceed the maximum allowed size.&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">+</span><span class="w">            </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">+</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">             </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">maxWidth</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">0</span><span class="w"> </span><span class="o">||</span><span class="w"> </span><span class="n">maxHeight</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">0</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                 </span><span class="k">return</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">             </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">-</span><span class="w">            </span><span class="kd">final</span><span class="w"> </span><span class="n">Size</span><span class="w"> </span><span class="n">size</span><span class="w"> </span><span class="o">=</span><span class="w"> </span><span class="n">info</span><span class="p">.</span><span class="na">getSize</span><span class="p">();</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">             </span><span class="k">if</span><span class="w"> </span><span class="p">(</span><span class="n">size</span><span class="p">.</span><span class="na">getWidth</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">maxWidth</span><span class="w"> </span><span class="o">&amp;&amp;</span><span class="w"> </span><span class="n">size</span><span class="p">.</span><span class="na">getHeight</span><span class="p">()</span><span class="w"> </span><span class="o">&lt;=</span><span class="w"> </span><span class="n">maxHeight</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">                 </span><span class="k">return</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">             </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">             </span><span class="c1">// ... rest of scaling logic unchanged ...</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">         </span><span class="p">});</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">-</span><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Resources</span><span class="p">.</span><span class="na">NotFoundException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="o">+</span><span class="w">    </span><span class="p">}</span><span class="w"> </span><span class="k">catch</span><span class="w"> </span><span class="p">(</span><span class="n">IOException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">Resources</span><span class="p">.</span><span class="na">NotFoundException</span><span class="w"> </span><span class="o">|</span><span class="w"> </span><span class="n">RuntimeException</span><span class="w"> </span><span class="n">e</span><span class="p">)</span><span class="w"> </span><span class="p">{</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">         </span><span class="n">Log</span><span class="p">.</span><span class="na">d</span><span class="p">(</span><span class="n">TAG</span><span class="p">,</span><span class="w"> </span><span class="s">&#34;Couldn&#39;t use ImageDecoder for drawable, falling back to non-resized load.&#34;</span><span class="p">);</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">         </span><span class="k">return</span><span class="w"> </span><span class="kc">null</span><span class="p">;</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w">     </span><span class="p">}</span><span class="w">
+</span></span></span><span class="line"><span class="cl"><span class="w"> </span><span class="p">}</span><span class="w">
+</span></span></span></code></pre></div><h2 id="-reporting-to-google--round-one"># Reporting to Google — Round One<a hidden class="anchor" aria-hidden="true" href="#-reporting-to-google--round-one">#</a></h2>
+<p>I filed the report on December 17, 2025. The device used for testing was:</p>
+<pre tabindex="0"><code>google/akita/akita:16/CP1A.260305.018/14887507:user/release-keys
+</code></pre><p>Google&rsquo;s initial response:</p>
+<blockquote>
+<p>When we first received your report, our team initially saw some stability issues. However, during further investigation by our engineers, we were unable to reproduce the persistent crash or the device being locked out on the latest versions of Android. On current software, the system correctly identifies and handles images that exceed the allowed size.</p>
+<p>Because we could not confirm the security impact on current builds, we decided this does not qualify as a security vulnerability. However, we really appreciate the time and effort you put into this report. To recognize your hard work, we have decided to keep your reward at the &ldquo;Critical&rdquo; level.</p>
+</blockquote>
+<p>Then on January 8, 2026 Google quietly updated the December security bulletin:</p>
+<blockquote>
+<p>CVE-2025-48631 has been removed due to an incomplete fix for Android 16 25Q4, all other Android versions are fine. Partners may keep this fix. An updated fix will be required as part of ASB#2026-03 Android Security Bulletin.</p>
+</blockquote>
+<p>When I saw this I assumed they had internally identified the same root cause I found and that the March 2026 patch would include a proper fix.</p>
+<h2 id="-march-2026--still-not-fixed"># March 2026 — Still Not Fixed<a hidden class="anchor" aria-hidden="true" href="#-march-2026--still-not-fixed">#</a></h2>
+<p>March 2026 security bulletin dropped. I checked the patch. No additional fix was introduced for this code path. I tested on the latest March build and the vulnerability was still triggering. I filed the report again with the full root cause analysis, the native code path, the suggested fix, and the PoC video showing the crash loop on the latest patched build.</p>
+<p>Google&rsquo;s response this time:</p>
+<blockquote>
+<p>After a thorough technical assessment by our engineering team, the determination remains that this issue will be closed as Won&rsquo;t Fix.</p>
+</blockquote>
+<p>Their reasoning was the same as before — they were unable to reproduce the persistent crash loop on current software builds.</p>
+<p>I pushed back. I pointed out that the PoC video shows the crash happening on the March 2026 security patch and that triggering a remote crash loop, even if it is recoverable, should be considered a security impact. A remote attacker being able to brick your phone for the duration of a message existing in your inbox is not nothing.</p>
+<p>On the question of disclosure, Google gave me the green light:</p>
+<blockquote>
+<p>Since we do not have a pending remediation for this issue, you are welcome to proceed with your blog post. We appreciate the high quality of your research and the detail you put into your root cause analysis.</p>
+</blockquote>
+<p>So here we are.</p>
+<h2 id="-closing-thoughts"># Closing Thoughts<a hidden class="anchor" aria-hidden="true" href="#-closing-thoughts">#</a></h2>
+<p>My main issue with the outcome is the framing around &ldquo;persistent crash loop.&rdquo; On my test devices I reproduced a persistent crash loop triggered by receiving a single RCS message, requiring only a reboot and clearing the notification to recover, but the fact that the device is unusable until that is done and that the crash re-triggers on boot is not a benign stability issue in my view. The attack surface is zero-click and reachable via any messaging app that generates MessagingStyle notifications and supports MMS/RCS.</p>
+<p>The incomplete fix story is also worth paying attention to. CVE-2025-48631 was patched, pulled from the bulletin, re-scheduled for March, never shipped. The private <code>resolveImage</code> method at L219 still does not have the dimension guard. If you are on Android and using Google Messages today, this is still the state of the code.</p>
+<p>Anyway, I learned a lot going through the AOSP source and the native decoder internals, and that was the whole point of starting this research. Hopefully this writeup is useful to someone. See you in the next one.</p>
+<h4 id="timeline">Timeline<a hidden class="anchor" aria-hidden="true" href="#timeline">#</a></h4>
+<ul>
+<li>Dec 2025 — Began reviewing the December 2025 Android Security Bulletin</li>
+<li>Dec 17, 2025 — First report filed with Android Security Team (issue tracker: <a href="https://issuetracker.google.com/issues/469775511">https://issuetracker.google.com/issues/469775511</a>)</li>
+<li>Jan 2026 — Google responds: unable to reproduce persistent crash, awards &ldquo;Critical&rdquo; reward anyway</li>
+<li>Jan 8, 2026 — Google removes CVE-2025-48631 from December bulletin; notes incomplete fix for Android 16 25Q4, fix rescheduled for March 2026 ASB</li>
+<li>Mar 2026 — March security bulletin ships with no fix for this code path</li>
+<li>Mar 2026 — Second report filed with updated root cause, PoC on latest March build</li>
+<li>May 2026 — Google closes as Won&rsquo;t Fix; authorizes public disclosure</li>
+</ul>
+
+
+  </div>
+
+  <footer class="post-footer">
+    <ul class="post-tags">
+      <li><a href="https://hulkvision.github.io/tags/android/">Android</a></li>
+      <li><a href="https://hulkvision.github.io/tags/dos/">Dos</a></li>
+      <li><a href="https://hulkvision.github.io/tags/cve/">Cve</a></li>
+    </ul>
+<nav class="paginav">
+  <a class="next" href="https://hulkvision.github.io/blog/javascript-interface/exploiting-javascript-interface/">
+    <span class="title">Next »</span>
+    <span>Exploiting JavaScript Interface for Unauthorized Access in a &#39;global&#39; cryptocurrency exchange android app</span>
+  </a>
+</nav>
+
+
+<ul class="share-buttons">
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix) on x"
+            href="https://x.com/intent/tweet/?text=Android%20Notification%20DoS%3a%20When%20a%20GIF%20Crashes%20Your%20Phone%20%28CVE-2025-48631%20Incomplete%20Fix%29&amp;url=https%3a%2f%2fhulkvision.github.io%2fblog%2fandroid-notification-dos%2fandroid-notification-dos%2f&amp;hashtags=android%2cdos%2ccve">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M512 62.554 L 512 449.446 C 512 483.97 483.97 512 449.446 512 L 62.554 512 C 28.03 512 0 483.97 0 449.446 L 0 62.554 C 0 28.03 28.029 0 62.554 0 L 449.446 0 C 483.971 0 512 28.03 512 62.554 Z M 269.951 190.75 L 182.567 75.216 L 56 75.216 L 207.216 272.95 L 63.9 436.783 L 125.266 436.783 L 235.9 310.383 L 332.567 436.783 L 456 436.783 L 298.367 228.367 L 432.367 75.216 L 371.033 75.216 Z M 127.633 110 L 164.101 110 L 383.481 400.065 L 349.5 400.065 Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix) on linkedin"
+            href="https://www.linkedin.com/shareArticle?mini=true&amp;url=https%3a%2f%2fhulkvision.github.io%2fblog%2fandroid-notification-dos%2fandroid-notification-dos%2f&amp;title=Android%20Notification%20DoS%3a%20When%20a%20GIF%20Crashes%20Your%20Phone%20%28CVE-2025-48631%20Incomplete%20Fix%29&amp;summary=Android%20Notification%20DoS%3a%20When%20a%20GIF%20Crashes%20Your%20Phone%20%28CVE-2025-48631%20Incomplete%20Fix%29&amp;source=https%3a%2f%2fhulkvision.github.io%2fblog%2fandroid-notification-dos%2fandroid-notification-dos%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-288.985,423.278l0,-225.717l-75.04,0l0,225.717l75.04,0Zm270.539,0l0,-129.439c0,-69.333 -37.018,-101.586 -86.381,-101.586c-39.804,0 -57.634,21.891 -67.617,37.266l0,-31.958l-75.021,0c0.995,21.181 0,225.717 0,225.717l75.02,0l0,-126.056c0,-6.748 0.486,-13.492 2.474,-18.315c5.414,-13.475 17.767,-27.434 38.494,-27.434c27.135,0 38.007,20.707 38.007,51.037l0,120.768l75.024,0Zm-307.552,-334.556c-25.674,0 -42.448,16.879 -42.448,39.002c0,21.658 16.264,39.002 41.455,39.002l0.484,0c26.165,0 42.452,-17.344 42.452,-39.002c-0.485,-22.092 -16.241,-38.954 -41.943,-39.002Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix) on reddit"
+            href="https://reddit.com/submit?url=https%3a%2f%2fhulkvision.github.io%2fblog%2fandroid-notification-dos%2fandroid-notification-dos%2f&title=Android%20Notification%20DoS%3a%20When%20a%20GIF%20Crashes%20Your%20Phone%20%28CVE-2025-48631%20Incomplete%20Fix%29">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-3.446,265.638c0,-22.964 -18.616,-41.58 -41.58,-41.58c-11.211,0 -21.361,4.457 -28.841,11.666c-28.424,-20.508 -67.586,-33.757 -111.204,-35.278l18.941,-89.121l61.884,13.157c0.756,15.734 13.642,28.29 29.56,28.29c16.407,0 29.706,-13.299 29.706,-29.701c0,-16.403 -13.299,-29.702 -29.706,-29.702c-11.666,0 -21.657,6.792 -26.515,16.578l-69.105,-14.69c-1.922,-0.418 -3.939,-0.042 -5.585,1.036c-1.658,1.073 -2.811,2.761 -3.224,4.686l-21.152,99.438c-44.258,1.228 -84.046,14.494 -112.837,35.232c-7.468,-7.164 -17.589,-11.591 -28.757,-11.591c-22.965,0 -41.585,18.616 -41.585,41.58c0,16.896 10.095,31.41 24.568,37.918c-0.639,4.135 -0.99,8.328 -0.99,12.576c0,63.977 74.469,115.836 166.33,115.836c91.861,0 166.334,-51.859 166.334,-115.836c0,-4.218 -0.347,-8.387 -0.977,-12.493c14.564,-6.47 24.735,-21.034 24.735,-38.001Zm-119.474,108.193c-20.27,20.241 -59.115,21.816 -70.534,21.816c-11.428,0 -50.277,-1.575 -70.522,-21.82c-3.007,-3.008 -3.007,-7.882 0,-10.889c3.003,-2.999 7.882,-3.003 10.885,0c12.777,12.781 40.11,17.317 59.637,17.317c19.522,0 46.86,-4.536 59.657,-17.321c3.016,-2.999 7.886,-2.995 10.885,0.008c3.008,3.011 3.003,7.882 -0.008,10.889Zm-5.23,-48.781c-16.373,0 -29.701,-13.324 -29.701,-29.698c0,-16.381 13.328,-29.714 29.701,-29.714c16.378,0 29.706,13.333 29.706,29.714c0,16.374 -13.328,29.698 -29.706,29.698Zm-160.386,-29.702c0,-16.381 13.328,-29.71 29.714,-29.71c16.369,0 29.689,13.329 29.689,29.71c0,16.373 -13.32,29.693 -29.689,29.693c-16.386,0 -29.714,-13.32 -29.714,-29.693Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix) on facebook"
+            href="https://facebook.com/sharer/sharer.php?u=https%3a%2f%2fhulkvision.github.io%2fblog%2fandroid-notification-dos%2fandroid-notification-dos%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-106.468,0l0,-192.915l66.6,0l12.672,-82.621l-79.272,0l0,-53.617c0,-22.603 11.073,-44.636 46.58,-44.636l36.042,0l0,-70.34c0,0 -32.71,-5.582 -63.982,-5.582c-65.288,0 -107.96,39.569 -107.96,111.204l0,62.971l-72.573,0l0,82.621l72.573,0l0,192.915l-191.104,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix) on whatsapp"
+            href="https://api.whatsapp.com/send?text=Android%20Notification%20DoS%3a%20When%20a%20GIF%20Crashes%20Your%20Phone%20%28CVE-2025-48631%20Incomplete%20Fix%29%20-%20https%3a%2f%2fhulkvision.github.io%2fblog%2fandroid-notification-dos%2fandroid-notification-dos%2f">
+            <svg version="1.1" viewBox="0 0 512 512" xml:space="preserve" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M449.446,0c34.525,0 62.554,28.03 62.554,62.554l0,386.892c0,34.524 -28.03,62.554 -62.554,62.554l-386.892,0c-34.524,0 -62.554,-28.03 -62.554,-62.554l0,-386.892c0,-34.524 28.029,-62.554 62.554,-62.554l386.892,0Zm-58.673,127.703c-33.842,-33.881 -78.847,-52.548 -126.798,-52.568c-98.799,0 -179.21,80.405 -179.249,179.234c-0.013,31.593 8.241,62.428 23.927,89.612l-25.429,92.884l95.021,-24.925c26.181,14.28 55.659,21.807 85.658,21.816l0.074,0c98.789,0 179.206,-80.413 179.247,-179.243c0.018,-47.895 -18.61,-92.93 -52.451,-126.81Zm-126.797,275.782l-0.06,0c-26.734,-0.01 -52.954,-7.193 -75.828,-20.767l-5.441,-3.229l-56.386,14.792l15.05,-54.977l-3.542,-5.637c-14.913,-23.72 -22.791,-51.136 -22.779,-79.287c0.033,-82.142 66.867,-148.971 149.046,-148.971c39.793,0.014 77.199,15.531 105.329,43.692c28.128,28.16 43.609,65.592 43.594,105.4c-0.034,82.149 -66.866,148.983 -148.983,148.984Zm81.721,-111.581c-4.479,-2.242 -26.499,-13.075 -30.604,-14.571c-4.105,-1.495 -7.091,-2.241 -10.077,2.241c-2.986,4.483 -11.569,14.572 -14.182,17.562c-2.612,2.988 -5.225,3.364 -9.703,1.12c-4.479,-2.241 -18.91,-6.97 -36.017,-22.23c-13.314,-11.876 -22.304,-26.542 -24.916,-31.026c-2.612,-4.484 -0.279,-6.908 1.963,-9.14c2.016,-2.007 4.48,-5.232 6.719,-7.847c2.24,-2.615 2.986,-4.484 4.479,-7.472c1.493,-2.99 0.747,-5.604 -0.374,-7.846c-1.119,-2.241 -10.077,-24.288 -13.809,-33.256c-3.635,-8.733 -7.327,-7.55 -10.077,-7.688c-2.609,-0.13 -5.598,-0.158 -8.583,-0.158c-2.986,0 -7.839,1.121 -11.944,5.604c-4.105,4.484 -15.675,15.32 -15.675,37.364c0,22.046 16.048,43.342 18.287,46.332c2.24,2.99 31.582,48.227 76.511,67.627c10.685,4.615 19.028,7.371 25.533,9.434c10.728,3.41 20.492,2.929 28.209,1.775c8.605,-1.285 26.499,-10.833 30.231,-21.295c3.732,-10.464 3.732,-19.431 2.612,-21.298c-1.119,-1.869 -4.105,-2.99 -8.583,-5.232Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix) on telegram"
+            href="https://telegram.me/share/url?text=Android%20Notification%20DoS%3a%20When%20a%20GIF%20Crashes%20Your%20Phone%20%28CVE-2025-48631%20Incomplete%20Fix%29&amp;url=https%3a%2f%2fhulkvision.github.io%2fblog%2fandroid-notification-dos%2fandroid-notification-dos%2f">
+            <svg version="1.1" xml:space="preserve" viewBox="2 2 28 28" height="30px" width="30px" fill="currentColor">
+                <path
+                    d="M26.49,29.86H5.5a3.37,3.37,0,0,1-2.47-1,3.35,3.35,0,0,1-1-2.47V5.48A3.36,3.36,0,0,1,3,3,3.37,3.37,0,0,1,5.5,2h21A3.38,3.38,0,0,1,29,3a3.36,3.36,0,0,1,1,2.46V26.37a3.35,3.35,0,0,1-1,2.47A3.38,3.38,0,0,1,26.49,29.86Zm-5.38-6.71a.79.79,0,0,0,.85-.66L24.73,9.24a.55.55,0,0,0-.18-.46.62.62,0,0,0-.41-.17q-.08,0-16.53,6.11a.59.59,0,0,0-.41.59.57.57,0,0,0,.43.52l4,1.24,1.61,4.83a.62.62,0,0,0,.63.43.56.56,0,0,0,.4-.17L16.54,20l4.09,3A.9.9,0,0,0,21.11,23.15ZM13.8,20.71l-1.21-4q8.72-5.55,8.78-5.55c.15,0,.23,0,.23.16a.18.18,0,0,1,0,.06s-2.51,2.3-7.52,6.8Z" />
+            </svg>
+        </a>
+    </li>
+    <li>
+        <a target="_blank" rel="noopener noreferrer" aria-label="share Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix) on ycombinator"
+            href="https://news.ycombinator.com/submitlink?t=Android%20Notification%20DoS%3a%20When%20a%20GIF%20Crashes%20Your%20Phone%20%28CVE-2025-48631%20Incomplete%20Fix%29&u=https%3a%2f%2fhulkvision.github.io%2fblog%2fandroid-notification-dos%2fandroid-notification-dos%2f">
+            <svg version="1.1" xml:space="preserve" width="30px" height="30px" viewBox="0 0 512 512" fill="currentColor"
+                xmlns:inkscape="http://www.inkscape.org/namespaces/inkscape">
+                <path
+                    d="M449.446 0C483.971 0 512 28.03 512 62.554L512 449.446C512 483.97 483.97 512 449.446 512L62.554 512C28.03 512 0 483.97 0 449.446L0 62.554C0 28.03 28.029 0 62.554 0L449.446 0ZM183.8767 87.9921H121.8427L230.6673 292.4508V424.0079H281.3328V292.4508L390.1575 87.9921H328.1233L256 238.2489z" />
+            </svg>
+        </a>
+    </li>
+</ul>
+
+  </footer>
+</article>
+    </main>
+    
+<footer class="footer">
+        <span>&copy; 2026 <a href="https://hulkvision.github.io/">hulkvision</a></span> · 
+
+    
+    
+    <span>
+        Powered by
+        <a href="https://gohugo.io/?utm_source=papermod" rel="noopener" target="_blank">Hugo</a> &
+        <a href="https://github.com/adityatelange/hugo-PaperMod/" rel="noopener" target="_blank">PaperMod</a>
+    </span>
+</footer>
+<a href="#top" id="top-link" class="top-link hidden" aria-label="go to top" title="Go to Top (Alt + G)" accesskey="g">
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"
+        stroke-linecap="round" stroke-linejoin="round" class="feather feather-chevrons-up">
+        <polyline points="17 11 12 6 7 11"></polyline>
+        <polyline points="17 18 12 13 7 18"></polyline>
+    </svg>
+</a>
+
+<script>
+    let menu = document.getElementById('menu');
+    if (menu) {
+        
+        const scrollPosition = localStorage.getItem("menu-scroll-position");
+        if (scrollPosition) {
+            menu.scrollLeft = parseInt(scrollPosition, 10);
+        }
+        
+        menu.onscroll = function () {
+            localStorage.setItem("menu-scroll-position", menu.scrollLeft);
+        }
+    }
+
+    document.querySelectorAll('a[href^="#"]').forEach(anchor => {
+        anchor.addEventListener("click", function (e) {
+            e.preventDefault();
+            var id = this.getAttribute("href").substr(1);
+            if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView({
+                    behavior: "smooth"
+                });
+            } else {
+                document.querySelector(`[id='${decodeURIComponent(id)}']`).scrollIntoView();
+            }
+            if (id === "top") {
+                history.replaceState(null, null, " ");
+            } else {
+                history.pushState(null, null, `#${id}`);
+            }
+        });
+    });
+
+</script>
+<script>
+    var toplink = document.getElementById("top-link");
+    window.onscroll = function () {
+        const scrollThreshold = window.innerHeight;
+        if (document.body.scrollTop > scrollThreshold || document.documentElement.scrollTop > scrollThreshold) {
+            toplink.classList.remove("hidden");
+        } else {
+            toplink.classList.add("hidden");
+        }
+    };
+
+</script>
+<script>
+    document.getElementById("theme-toggle").addEventListener("click", () => {
+        const html = document.querySelector("html");
+        if (html.dataset.theme === "dark") {
+            html.dataset.theme = 'light';
+            localStorage.setItem("pref-theme", 'light');
+        } else {
+            html.dataset.theme = 'dark';
+            localStorage.setItem("pref-theme", 'dark');
+        }
+    })
+
+</script>
+<script>
+    document.querySelectorAll('pre > code').forEach((codeblock) => {
+        const container = codeblock.parentNode.parentNode;
+
+        const copybutton = document.createElement('button');
+        copybutton.classList.add('copy-code');
+        copybutton.innerHTML = 'copy';
+
+        function copyingDone() {
+            copybutton.innerHTML = 'copied!';
+            setTimeout(() => {
+                copybutton.innerHTML = 'copy';
+            }, 2000);
+        }
+
+        copybutton.addEventListener('click', (cb) => {
+            if ('clipboard' in navigator) {
+                navigator.clipboard.writeText(codeblock.textContent);
+                copyingDone();
+                return;
+            }
+
+            const range = document.createRange();
+            range.selectNodeContents(codeblock);
+            const selection = window.getSelection();
+            selection.removeAllRanges();
+            selection.addRange(range);
+            try {
+                document.execCommand('copy');
+                copyingDone();
+            } catch (e) { };
+            selection.removeRange(range);
+        });
+
+        if (container.classList.contains("highlight")) {
+            container.appendChild(copybutton);
+        } else if (container.parentNode.firstChild == container) {
+            
+        } else if (codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.nodeName == "TABLE") {
+            
+            codeblock.parentNode.parentNode.parentNode.parentNode.parentNode.appendChild(copybutton);
+        } else {
+            
+            codeblock.parentNode.appendChild(copybutton);
+        }
+    });
+</script>
+</body>
+
+</html>

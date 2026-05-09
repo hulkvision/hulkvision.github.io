@@ -1,0 +1,25 @@
+<?xml version="1.0" encoding="utf-8" standalone="yes"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom" xmlns:content="http://purl.org/rss/1.0/modules/content/">
+  <channel>
+    <title>Cve on hulkvision</title>
+    <link>https://hulkvision.github.io/tags/cve/</link>
+    <description>Recent content in Cve on hulkvision</description>
+    <image>
+      <title>hulkvision</title>
+      <url>https://hulkvision.github.io/profile.png</url>
+      <link>https://hulkvision.github.io/profile.png</link>
+    </image>
+    <generator>Hugo</generator>
+    <language>en</language>
+    <lastBuildDate>Sat, 09 May 2026 11:16:51 +0530</lastBuildDate>
+    <atom:link href="https://hulkvision.github.io/tags/cve/index.xml" rel="self" type="application/rss+xml" />
+    <item>
+      <title>Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix)</title>
+      <link>https://hulkvision.github.io/blog/android-notification-dos/android-notification-dos/</link>
+      <pubDate>Sat, 09 May 2026 11:16:51 +0530</pubDate>
+      <guid>https://hulkvision.github.io/blog/android-notification-dos/android-notification-dos/</guid>
+      <description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
+&lt;p&gt;In December 2025 I decided to try something different, a long pending goal of mine I wanted to start looking at the Android OS itself. I figured the best way to get started was to go through the Android Security Bulletin and study the types of issues being reported and fixed by the Android security team. I went through the December 2025 bulletin and one vulnerability stood out to me, CVE-2025-48631, a critical Denial-of-Service in the notification image decoding pipeline. The fix included a sample malformed GIF which made it very easy to test. What started as a simple reproduction exercise turned into discovering that the fix was incomplete, and that the vulnerability was still triggering on the latest patched version of Android.&lt;/p&gt;</description>
+    </item>
+  </channel>
+</rss>

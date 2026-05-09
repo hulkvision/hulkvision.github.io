@@ -9,15 +9,29 @@
       <url>https://hulkvision.github.io/profile.png</url>
       <link>https://hulkvision.github.io/profile.png</link>
     </image>
-    <generator>Hugo -- 0.134.0</generator>
+    <generator>Hugo</generator>
     <language>en</language>
-    <lastBuildDate>Wed, 04 Sep 2024 11:16:51 +0530</lastBuildDate>
+    <lastBuildDate>Sat, 09 May 2026 11:16:51 +0530</lastBuildDate>
     <atom:link href="https://hulkvision.github.io/tags/index.xml" rel="self" type="application/rss+xml" />
     <item>
       <title>Android</title>
       <link>https://hulkvision.github.io/tags/android/</link>
-      <pubDate>Wed, 04 Sep 2024 11:16:51 +0530</pubDate>
+      <pubDate>Sat, 09 May 2026 11:16:51 +0530</pubDate>
       <guid>https://hulkvision.github.io/tags/android/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Cve</title>
+      <link>https://hulkvision.github.io/tags/cve/</link>
+      <pubDate>Sat, 09 May 2026 11:16:51 +0530</pubDate>
+      <guid>https://hulkvision.github.io/tags/cve/</guid>
+      <description></description>
+    </item>
+    <item>
+      <title>Dos</title>
+      <link>https://hulkvision.github.io/tags/dos/</link>
+      <pubDate>Sat, 09 May 2026 11:16:51 +0530</pubDate>
+      <guid>https://hulkvision.github.io/tags/dos/</guid>
       <description></description>
     </item>
   </channel>
