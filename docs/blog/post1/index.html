@@ -7,23 +7,7 @@
 <meta name="robots" content="index, follow">
 <title>RCE in Adobe Acrobat Reader for android(CVE-2021-40724) | hulkvision</title>
 <meta name="keywords" content="">
-<meta name="description" content="# Summary
-While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path traversal vulnerability.
-Abode reader was also using Google play core library for dynamic code loading. using path traversal bug and dynamic code loading,i was able to acheive remote code execution.
-# Finding Path traversal vulnerability
-        &lt;activity android:theme=&#34;@style/Theme_Virgo_SplashScreen&#34; android:name=&#34;com.adobe.reader.AdobeReader&#34; android:exported=&#34;true&#34; android:launchMode=&#34;singleTask&#34; android:screenOrientation=&#34;user&#34; android:configChanges=&#34;keyboardHidden|screenLayout|screenSize|smallestScreenSize&#34; android:noHistory=&#34;false&#34; android:resizeableActivity=&#34;true&#34;&gt;
-            &lt;intent-filter&gt;
-                &lt;action android:name=&#34;android.intent.action.VIEW&#34;/&gt;
-                &lt;action android:name=&#34;android.intent.action.EDIT&#34;/&gt;
-                &lt;category android:name=&#34;android.intent.category.DEFAULT&#34;/&gt;
-                &lt;category android:name=&#34;android.intent.category.BROWSABLE&#34;/&gt;
-                &lt;data android:scheme=&#34;file&#34;/&gt;
-                &lt;data android:scheme=&#34;content&#34;/&gt;
-                &lt;data android:scheme=&#34;http&#34;/&gt;
-                &lt;data android:scheme=&#34;https&#34;/&gt;
-                &lt;data android:mimeType=&#34;application/pdf&#34;/&gt;
-            &lt;/intent-filter&gt;
-There is this intent-filter in the app which shows it will accept http/https url scheme and mimeType should be application/pdf for this actiivity.">
+<meta name="description" content="Path traversal &#43; dynamic code loading in Adobe Acrobat Reader for Android led to remote code execution (CVE-2021-40724).">
 <meta name="author" content="Sunny Gupta">
 <link rel="canonical" href="https://hulkvision.github.io/blog/post1/">
 <link crossorigin="anonymous" href="/assets/css/stylesheet.a1a1b118b3e83435265dc39da18e54244bcc0e5481d1d034aadc0c899c51e15c.css" integrity="sha256-oaGxGLPoNDUmXcOdoY5UJEvMDlSB0dA0qtwMiZxR4Vw=" rel="preload stylesheet" as="style">
@@ -83,8 +67,7 @@ There is this intent-filter in the app which shows it will accept http/https url
 </script><meta property="og:url" content="https://hulkvision.github.io/blog/post1/">
   <meta property="og:site_name" content="hulkvision">
   <meta property="og:title" content="RCE in Adobe Acrobat Reader for android(CVE-2021-40724)">
-  <meta property="og:description" content="# Summary While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path traversal vulnerability. Abode reader was also using Google play core library for dynamic code loading. using path traversal bug and dynamic code loading,i was able to acheive remote code execution.
-# Finding Path traversal vulnerability &lt;activity android:theme=&#34;@style/Theme_Virgo_SplashScreen&#34; android:name=&#34;com.adobe.reader.AdobeReader&#34; android:exported=&#34;true&#34; android:launchMode=&#34;singleTask&#34; android:screenOrientation=&#34;user&#34; android:configChanges=&#34;keyboardHidden|screenLayout|screenSize|smallestScreenSize&#34; android:noHistory=&#34;false&#34; android:resizeableActivity=&#34;true&#34;&gt; &lt;intent-filter&gt; &lt;action android:name=&#34;android.intent.action.VIEW&#34;/&gt; &lt;action android:name=&#34;android.intent.action.EDIT&#34;/&gt; &lt;category android:name=&#34;android.intent.category.DEFAULT&#34;/&gt; &lt;category android:name=&#34;android.intent.category.BROWSABLE&#34;/&gt; &lt;data android:scheme=&#34;file&#34;/&gt; &lt;data android:scheme=&#34;content&#34;/&gt; &lt;data android:scheme=&#34;http&#34;/&gt; &lt;data android:scheme=&#34;https&#34;/&gt; &lt;data android:mimeType=&#34;application/pdf&#34;/&gt; &lt;/intent-filter&gt; There is this intent-filter in the app which shows it will accept http/https url scheme and mimeType should be application/pdf for this actiivity.">
+  <meta property="og:description" content="Path traversal &#43; dynamic code loading in Adobe Acrobat Reader for Android led to remote code execution (CVE-2021-40724).">
   <meta property="og:locale" content="en">
   <meta property="og:type" content="article">
     <meta property="article:section" content="blog">
@@ -95,8 +78,7 @@ There is this intent-filter in the app which shows it will accept http/https url
   <meta name="twitter:card" content="summary_large_image">
   <meta name="twitter:image" content="https://hulkvision.github.io/profile.png">
   <meta name="twitter:title" content="RCE in Adobe Acrobat Reader for android(CVE-2021-40724)">
-  <meta name="twitter:description" content="# Summary While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path traversal vulnerability. Abode reader was also using Google play core library for dynamic code loading. using path traversal bug and dynamic code loading,i was able to acheive remote code execution.
-# Finding Path traversal vulnerability &lt;activity android:theme=&#34;@style/Theme_Virgo_SplashScreen&#34; android:name=&#34;com.adobe.reader.AdobeReader&#34; android:exported=&#34;true&#34; android:launchMode=&#34;singleTask&#34; android:screenOrientation=&#34;user&#34; android:configChanges=&#34;keyboardHidden|screenLayout|screenSize|smallestScreenSize&#34; android:noHistory=&#34;false&#34; android:resizeableActivity=&#34;true&#34;&gt; &lt;intent-filter&gt; &lt;action android:name=&#34;android.intent.action.VIEW&#34;/&gt; &lt;action android:name=&#34;android.intent.action.EDIT&#34;/&gt; &lt;category android:name=&#34;android.intent.category.DEFAULT&#34;/&gt; &lt;category android:name=&#34;android.intent.category.BROWSABLE&#34;/&gt; &lt;data android:scheme=&#34;file&#34;/&gt; &lt;data android:scheme=&#34;content&#34;/&gt; &lt;data android:scheme=&#34;http&#34;/&gt; &lt;data android:scheme=&#34;https&#34;/&gt; &lt;data android:mimeType=&#34;application/pdf&#34;/&gt; &lt;/intent-filter&gt; There is this intent-filter in the app which shows it will accept http/https url scheme and mimeType should be application/pdf for this actiivity.">
+  <meta name="twitter:description" content="Path traversal &#43; dynamic code loading in Adobe Acrobat Reader for Android led to remote code execution (CVE-2021-40724).">
 
 
 <script type="application/ld+json">
@@ -125,7 +107,7 @@ There is this intent-filter in the app which shows it will accept http/https url
   "@type": "BlogPosting",
   "headline": "RCE in Adobe Acrobat Reader for android(CVE-2021-40724)",
   "name": "RCE in Adobe Acrobat Reader for android(CVE-2021-40724)",
-  "description": "# Summary While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path traversal vulnerability. Abode reader was also using Google play core library for dynamic code loading. using path traversal bug and dynamic code loading,i was able to acheive remote code execution.\n# Finding Path traversal vulnerability \u0026lt;activity android:theme=\u0026#34;@style/Theme_Virgo_SplashScreen\u0026#34; android:name=\u0026#34;com.adobe.reader.AdobeReader\u0026#34; android:exported=\u0026#34;true\u0026#34; android:launchMode=\u0026#34;singleTask\u0026#34; android:screenOrientation=\u0026#34;user\u0026#34; android:configChanges=\u0026#34;keyboardHidden|screenLayout|screenSize|smallestScreenSize\u0026#34; android:noHistory=\u0026#34;false\u0026#34; android:resizeableActivity=\u0026#34;true\u0026#34;\u0026gt; \u0026lt;intent-filter\u0026gt; \u0026lt;action android:name=\u0026#34;android.intent.action.VIEW\u0026#34;/\u0026gt; \u0026lt;action android:name=\u0026#34;android.intent.action.EDIT\u0026#34;/\u0026gt; \u0026lt;category android:name=\u0026#34;android.intent.category.DEFAULT\u0026#34;/\u0026gt; \u0026lt;category android:name=\u0026#34;android.intent.category.BROWSABLE\u0026#34;/\u0026gt; \u0026lt;data android:scheme=\u0026#34;file\u0026#34;/\u0026gt; \u0026lt;data android:scheme=\u0026#34;content\u0026#34;/\u0026gt; \u0026lt;data android:scheme=\u0026#34;http\u0026#34;/\u0026gt; \u0026lt;data android:scheme=\u0026#34;https\u0026#34;/\u0026gt; \u0026lt;data android:mimeType=\u0026#34;application/pdf\u0026#34;/\u0026gt; \u0026lt;/intent-filter\u0026gt; There is this intent-filter in the app which shows it will accept http/https url scheme and mimeType should be application/pdf for this actiivity.\n",
+  "description": "Path traversal + dynamic code loading in Adobe Acrobat Reader for Android led to remote code execution (CVE-2021-40724).",
   "keywords": [
     
   ],
@@ -224,6 +206,9 @@ There is this intent-filter in the app which shows it will accept http/https url
     <h1 class="post-title entry-hint-parent">
       RCE in Adobe Acrobat Reader for android(CVE-2021-40724)
     </h1>
+    <div class="post-description">
+      Path traversal &#43; dynamic code loading in Adobe Acrobat Reader for Android led to remote code execution (CVE-2021-40724).
+    </div>
     <div class="post-meta">
 
 <span title='2022-01-14 11:16:51 +0530 IST'>January 14, 2022</span>&nbsp;·&nbsp;<span>5 min</span>&nbsp;·&nbsp;<span>Sunny Gupta</span>&nbsp;|&nbsp;<span>

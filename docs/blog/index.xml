@@ -18,39 +18,21 @@
       <link>https://hulkvision.github.io/blog/android-notification-dos/android-notification-dos/</link>
       <pubDate>Sat, 09 May 2026 11:16:51 +0530</pubDate>
       <guid>https://hulkvision.github.io/blog/android-notification-dos/android-notification-dos/</guid>
-      <description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
-&lt;p&gt;In December 2025 I decided to try something different, a long pending goal of mine I wanted to start looking at the Android OS itself. I figured the best way to get started was to go through the Android Security Bulletin and study the types of issues being reported and fixed by the Android security team. I went through the December 2025 bulletin and one vulnerability stood out to me, CVE-2025-48631, a critical Denial-of-Service in the notification image decoding pipeline. The fix included a sample malformed GIF which made it very easy to test. What started as a simple reproduction exercise turned into discovering that the fix was incomplete, and that the vulnerability was still triggering on the latest patched version of Android.&lt;/p&gt;</description>
+      <description>CVE-2025-48631 was marked as fixed in Android&amp;#39;s December 2025 bulletin — but the fix was incomplete. Here&amp;#39;s how I found the bypass.</description>
     </item>
     <item>
       <title>Exploiting JavaScript Interface for Unauthorized Access in a &#39;global&#39; cryptocurrency exchange android app</title>
       <link>https://hulkvision.github.io/blog/javascript-interface/exploiting-javascript-interface/</link>
       <pubDate>Wed, 04 Sep 2024 11:16:51 +0530</pubDate>
       <guid>https://hulkvision.github.io/blog/javascript-interface/exploiting-javascript-interface/</guid>
-      <description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
-&lt;p&gt;Webview in Android Ecosystem is an extension of Android&amp;rsquo;s view class that lets you display web pages as a part of your application activity layout. You can call it as a web browser built into your application but it doesn&amp;rsquo;t include the features of a fully developed web browser, such as navigation controls or an address bar. It is one of the widely used component in android application ecosystem, it is also prone to number of potential errors. If it is possible to load arbitrary url or execute arbitrary javascript in webview it could potentially lead to leaking of authentication tokens, the theft of arbitrary files and access to arbitrary activities. In this blog I will show how I exploited the exposed javascript interface by the application to perform critical authenticated actions like placing a trade order, cancelling trade order or deactivting the account.&lt;/p&gt;</description>
+      <description>How I exploited an exposed JavaScript interface in a major crypto exchange&amp;#39;s Android app to perform authenticated actions like placing trades and deactivating accounts.</description>
     </item>
     <item>
       <title>RCE in Adobe Acrobat Reader for android(CVE-2021-40724)</title>
       <link>https://hulkvision.github.io/blog/post1/</link>
       <pubDate>Fri, 14 Jan 2022 11:16:51 +0530</pubDate>
       <guid>https://hulkvision.github.io/blog/post1/</guid>
-      <description>&lt;h2 id=&#34;-summary&#34;&gt;# Summary&lt;/h2&gt;
-&lt;p&gt;While testing Adobe Acrobat reader app , the app has a feature which allows user to open pdfs directly from http/https url. This feature was vulnerable to path traversal vulnerability.
-Abode reader was also using Google play core library for dynamic code loading. using path traversal bug and dynamic code loading,i was able to acheive remote code execution.&lt;/p&gt;
-&lt;h2 id=&#34;-finding-path-traversal-vulnerability&#34;&gt;# Finding Path traversal vulnerability&lt;/h2&gt;
-&lt;pre tabindex=&#34;0&#34;&gt;&lt;code&gt;        &amp;lt;activity android:theme=&amp;#34;@style/Theme_Virgo_SplashScreen&amp;#34; android:name=&amp;#34;com.adobe.reader.AdobeReader&amp;#34; android:exported=&amp;#34;true&amp;#34; android:launchMode=&amp;#34;singleTask&amp;#34; android:screenOrientation=&amp;#34;user&amp;#34; android:configChanges=&amp;#34;keyboardHidden|screenLayout|screenSize|smallestScreenSize&amp;#34; android:noHistory=&amp;#34;false&amp;#34; android:resizeableActivity=&amp;#34;true&amp;#34;&amp;gt;
-            &amp;lt;intent-filter&amp;gt;
-                &amp;lt;action android:name=&amp;#34;android.intent.action.VIEW&amp;#34;/&amp;gt;
-                &amp;lt;action android:name=&amp;#34;android.intent.action.EDIT&amp;#34;/&amp;gt;
-                &amp;lt;category android:name=&amp;#34;android.intent.category.DEFAULT&amp;#34;/&amp;gt;
-                &amp;lt;category android:name=&amp;#34;android.intent.category.BROWSABLE&amp;#34;/&amp;gt;
-                &amp;lt;data android:scheme=&amp;#34;file&amp;#34;/&amp;gt;
-                &amp;lt;data android:scheme=&amp;#34;content&amp;#34;/&amp;gt;
-                &amp;lt;data android:scheme=&amp;#34;http&amp;#34;/&amp;gt;
-                &amp;lt;data android:scheme=&amp;#34;https&amp;#34;/&amp;gt;
-                &amp;lt;data android:mimeType=&amp;#34;application/pdf&amp;#34;/&amp;gt;
-            &amp;lt;/intent-filter&amp;gt;
-&lt;/code&gt;&lt;/pre&gt;&lt;p&gt;There is this intent-filter in the app which shows it will accept http/https url scheme and mimeType should be &lt;code&gt;application/pdf&lt;/code&gt; for this actiivity.&lt;/p&gt;</description>
+      <description>Path traversal &#43; dynamic code loading in Adobe Acrobat Reader for Android led to remote code execution (CVE-2021-40724).</description>
     </item>
   </channel>
 </rss>

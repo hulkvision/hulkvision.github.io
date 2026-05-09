@@ -69,7 +69,7 @@ params:
   ShowPageNums: true
   ShowToc: true
   # comments: false
-  images: ["profile.png"]
+  images: ["https://hulkvision.github.io/profile.png"]
 
   # profileMode:
   #   enabled: false
@@ -106,7 +106,7 @@ params:
   
 
   homeInfoParams:
-    Title: "<img src=profile.png style=\"width: 200px; height: 200px; border-radius: 50%; object-fit: cover;\"></img>hulkvision's Blog"
+    Title: "<img src=\"/profile.png\" style=\"width: 200px; height: 200px; border-radius: 50%; object-fit: cover;\">hulkvision's Blog"
     Content: >
       👋 HI! I'M SUNNY 👋WELCOME!
     
@@ -129,10 +129,9 @@ params:
   #     apple_touch_icon: "<link / abs url>"
   #     safari_pinned_tab: "<link / abs url>"
 
-  # cover:
-  #     hidden: true # hide everywhere but not in structured data
-  #     hiddenInList: true # hide on list pages and home
-  #     hiddenInSingle: true # hide on single page
+  cover:
+    hiddenInList: true
+    hiddenInSingle: true
 
   # fuseOpts:
   #     isCaseSensitive: false

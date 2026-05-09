@@ -18,16 +18,14 @@
       <link>https://hulkvision.github.io/blog/android-notification-dos/android-notification-dos/</link>
       <pubDate>Sat, 09 May 2026 11:16:51 +0530</pubDate>
       <guid>https://hulkvision.github.io/blog/android-notification-dos/android-notification-dos/</guid>
-      <description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
-&lt;p&gt;In December 2025 I decided to try something different, a long pending goal of mine I wanted to start looking at the Android OS itself. I figured the best way to get started was to go through the Android Security Bulletin and study the types of issues being reported and fixed by the Android security team. I went through the December 2025 bulletin and one vulnerability stood out to me, CVE-2025-48631, a critical Denial-of-Service in the notification image decoding pipeline. The fix included a sample malformed GIF which made it very easy to test. What started as a simple reproduction exercise turned into discovering that the fix was incomplete, and that the vulnerability was still triggering on the latest patched version of Android.&lt;/p&gt;</description>
+      <description>CVE-2025-48631 was marked as fixed in Android&amp;#39;s December 2025 bulletin — but the fix was incomplete. Here&amp;#39;s how I found the bypass.</description>
     </item>
     <item>
       <title>Exploiting JavaScript Interface for Unauthorized Access in a &#39;global&#39; cryptocurrency exchange android app</title>
       <link>https://hulkvision.github.io/blog/javascript-interface/exploiting-javascript-interface/</link>
       <pubDate>Wed, 04 Sep 2024 11:16:51 +0530</pubDate>
       <guid>https://hulkvision.github.io/blog/javascript-interface/exploiting-javascript-interface/</guid>
-      <description>&lt;h2 id=&#34;intro&#34;&gt;Intro&lt;/h2&gt;
-&lt;p&gt;Webview in Android Ecosystem is an extension of Android&amp;rsquo;s view class that lets you display web pages as a part of your application activity layout. You can call it as a web browser built into your application but it doesn&amp;rsquo;t include the features of a fully developed web browser, such as navigation controls or an address bar. It is one of the widely used component in android application ecosystem, it is also prone to number of potential errors. If it is possible to load arbitrary url or execute arbitrary javascript in webview it could potentially lead to leaking of authentication tokens, the theft of arbitrary files and access to arbitrary activities. In this blog I will show how I exploited the exposed javascript interface by the application to perform critical authenticated actions like placing a trade order, cancelling trade order or deactivting the account.&lt;/p&gt;</description>
+      <description>How I exploited an exposed JavaScript interface in a major crypto exchange&amp;#39;s Android app to perform authenticated actions like placing trades and deactivating accounts.</description>
     </item>
   </channel>
 </rss>

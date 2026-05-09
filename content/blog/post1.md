@@ -1,7 +1,7 @@
 ---
 title: "RCE in Adobe Acrobat Reader for android(CVE-2021-40724)"
 date: 2022-01-14T11:16:51+05:30
-Description: ""
+Description: "Path traversal + dynamic code loading in Adobe Acrobat Reader for Android led to remote code execution (CVE-2021-40724)."
 Tags: []
 Categories: []
 DisableComments: false

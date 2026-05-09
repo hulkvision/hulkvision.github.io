@@ -1,10 +1,14 @@
 ---
 title: "Android Notification DoS: When a GIF Crashes Your Phone (CVE-2025-48631 Incomplete Fix)"
 date: 2026-05-09T11:16:51+05:30
-Description: ""
+Description: "CVE-2025-48631 was marked as fixed in Android's December 2025 bulletin — but the fix was incomplete. Here's how I found the bypass."
 Tags: [android, dos, cve]
 Categories: []
 DisableComments: false
+cover:
+  image: /android-notification-dos/macshot-clipboard-093E0501-95D2-413C-AB5E-A2FE6D0EA7CE.png
+  alt: "CVE-2025-48631 removed from Android Security Bulletin due to incomplete fix"
+  relative: false
 ---
 
 ## Intro
