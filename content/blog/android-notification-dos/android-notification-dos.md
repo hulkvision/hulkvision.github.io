@@ -180,7 +180,7 @@ The fix is to add the hard dimension limit check inside the `onHeaderDecoded` li
 I filed the report on December 17, 2025. The device used for testing was:
 
 ```
-google/akita/akita:16/CP1A.260305.018/14887507:user/release-keys
+google/akita/akita:16/BP4A.251205.006/14401865:user/release-keys
 ```
 
 Google's initial response:
